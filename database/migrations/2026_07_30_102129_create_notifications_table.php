@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('type');
             $table->json('data')->nullable();
             $table->timestamp('read_at')->nullable();
-            $table->timestamp('created_at')->nullable()->useCurrent();
+            $table->timestamps();
 
             $table->index(['user_id', 'read_at'], 'idx_user_unread');
         });

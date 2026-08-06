@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('participant1_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('participant2_id')->constrained('users')->cascadeOnDelete();
+            $table->timestamp('last_message_at')->nullable();
             $table->timestamps();
 
             // participant1_id < participant2_id دائماً — يُفرض في app layer

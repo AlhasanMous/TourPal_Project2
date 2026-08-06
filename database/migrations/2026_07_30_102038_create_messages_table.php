@@ -19,6 +19,8 @@ return new class extends Migration
             // NULL مسموح إذا كانت الرسالة صورة فقط
             $table->text('content')->nullable();
             $table->string('image_path')->nullable();
+            $table->boolean('deleted_by_sender')->default(false);
+            $table->boolean('deleted_by_receiver')->default(false);
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
 

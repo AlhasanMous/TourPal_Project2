@@ -6,6 +6,10 @@ use Spatie\Permission\Models\Role;
 
 return [
 
+    'defaults' => [
+        'guard' => 'api',
+    ],
+    
     'models' => [
 
         /*
