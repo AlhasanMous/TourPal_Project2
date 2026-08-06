@@ -66,4 +66,14 @@ class Place extends Model
     {
         return $this->hasMany(WorkspacePlace::class);
     }
+    public function images(): MorphMany
+{
+    return $this->morphMany(Image::class, 'imageable')
+                ->orderBy('sort_order');
+}
+public function mainImage(): MorphMany
+{
+    return $this->morphMany(Image::class, 'imageable')
+                ->where('is_main', true);
+}
 }

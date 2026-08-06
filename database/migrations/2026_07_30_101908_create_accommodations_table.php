@@ -17,10 +17,10 @@ return new class extends Migration
             $table->string('name');
             $table->enum('type', ['hotel', 'hostel', 'shared']);
             $table->foreignId('city_id')->constrained('cities')->cascadeOnDelete();
-            $table->json('photos')->nullable();
+            // $table->json('photos')->nullable();
             $table->integer('capacity');
             $table->string('price_range')->nullable();
-            $table->string('verification_status')->default('pending');
+            $table->enum('verification_status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamp('verified_at')->nullable();
             $table->text('rejection_reason')->nullable();
             $table->timestamps();

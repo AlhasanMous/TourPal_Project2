@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('city_id')->constrained('cities')->restrictOnDelete();
-            $table->string('verification_status')->default('pending');
+            $table->enum('verification_status', ['pending', 'approved', 'rejected']) ->default('pending');
             $table->timestamp('verified_at')->nullable();
             $table->text('rejection_reason')->nullable();
-            $table->string('specializations')->nullable();
+            $table->json('specializations')->nullable();
             $table->json('availability')->nullable();
             $table->timestamps();
 

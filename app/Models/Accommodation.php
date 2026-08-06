@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Accommodation extends Model
 {
@@ -49,4 +50,15 @@ class Accommodation extends Model
     {
         return $this->morphMany(Review::class, 'reviewable');
     }
+    public function images(): MorphMany
+{
+    return $this->morphMany(Image::class, 'imageable')
+                ->orderBy('sort_order');
+}
+
+public function mainImage(): MorphOne
+{
+    return $this->morphMany(Image::class, 'imageable')
+                ->where('is_main', true);
+}
 }

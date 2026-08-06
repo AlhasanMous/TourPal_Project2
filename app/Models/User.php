@@ -11,9 +11,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles, SoftDeletes;
+    use HasApiTokens,HasFactory, Notifiable, HasRoles, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -70,7 +71,7 @@ class User extends Authenticatable
         return $this->hasMany(Review::class, 'reviewer_user_id');
     }
 
-    public function wishlist(): HasMany
+    public function wishlists(): HasMany
     {
         return $this->hasMany(Wishlist::class);
     }
@@ -79,4 +80,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Notification::class);
     }
+    public function WorkspaceTimelineParticipants(): HasMany
+{
+    return $this->hasMany(WorkspaceTimelineParticipant::class);
+}
+
+public function timelineItems(): HasMany
+{
+    return $this->hasMany(WorkspaceTimelineItem::class, 'added_by');
+}
+
 }

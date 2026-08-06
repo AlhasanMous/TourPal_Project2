@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('description_en');
             $table->foreignId('city_id')->constrained('cities')->cascadeOnDelete();
             $table->string('category');
-            $table->json('photos')->nullable();
+            // $table->json('photos')->nullable();
             $table->decimal('avg_rating', 3, 2)->default(0.00);
             $table->integer('visit_duration_hours')->default(1);
             $table->json('opening_hours')->nullable();
