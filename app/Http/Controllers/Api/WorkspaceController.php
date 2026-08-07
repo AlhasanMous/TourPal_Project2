@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\Workspace\StoreWorkspaceRequest;
 use App\Http\Requests\Workspace\UpdateWorkspaceRequest;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests; 
+
 use App\Http\Resources\WorkspaceResource;
 use App\Models\Workspace;
 use App\Services\WorkspaceService;
 use Illuminate\Http\JsonResponse;
 class WorkspaceController extends Controller
 {
+      use AuthorizesRequests; 
     //
     public function __construct(private WorkspaceService $workspaceService) {}
 

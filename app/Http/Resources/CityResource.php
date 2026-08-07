@@ -19,6 +19,8 @@ class CityResource extends JsonResource
             'name_ar'   => $this->name_ar,
             'name_en'   => $this->name_en,
             'region'    => $this->region,
+            'places_count' => $this->whenCounted('places'), // ← عدد الأماكن
+            'created_at'   => $this->created_at,
         ];
     }
 }

@@ -6,16 +6,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\WorkspaceController;
-
+use App\Http\Controllers\Api\WorkspaceParticipantController;
 // ─── Public Auth ─────────────────────────────────────────
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login',    [AuthController::class, 'login']);
-    Route::apiResource('workspaces', WorkspaceController::class);
+  
 });
 
 // ─── Public: عرض المدن والأماكن ─────────────────────────
 Route::get('cities',         [CityController::class,  'index']);
+Route::get('cities/{city}', [CityController::class, 'show']);
 Route::get('places',         [PlaceController::class, 'index']);
 Route::get('places/{place}', [PlaceController::class, 'show']);
 
@@ -23,6 +24,14 @@ Route::get('places/{place}', [PlaceController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('auth/logout', [AuthController::class, 'logout']);
     Route::get('auth/me',      [AuthController::class, 'me']);
+    Route::apiResource('workspaces', WorkspaceController::class);
+    // Workspace Participants
+    Route::prefix('workspaces/{workspace}')->group(function () {
+    Route::post('invite',                    [WorkspaceParticipantController::class, 'invite']);
+    Route::post('accept',                    [WorkspaceParticipantController::class, 'accept']);
+    Route::post('decline',                   [WorkspaceParticipantController::class, 'decline']);
+    Route::delete('participants/{userId}',   [WorkspaceParticipantController::class, 'remove']);
+});
 });
 
 // ─── Admin only ──────────────────────────────────────────

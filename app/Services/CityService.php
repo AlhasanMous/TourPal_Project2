@@ -3,13 +3,24 @@
 namespace App\Services;
 
 use App\Models\City;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class CityService
 {
-    public function getAll(): Collection
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return City::orderBy('name_en')->get();
+        $query = City::withCount('places'); // ← عدد الأماكن
+
+        // بحث
+        if (!empty($filters['search'])) {
+            $query->where(function ($q) use ($filters) {
+                $q->where('name_ar', 'like', '%' . $filters['search'] . '%')
+                  ->orWhere('name_en', 'like', '%' . $filters['search'] . '%')
+                  ->orWhere('region',  'like', '%' . $filters['search'] . '%');
+            });
+        }
+
+        return $query->orderBy('name_en')->paginate(20);
     }
 
     public function create(array $data): City

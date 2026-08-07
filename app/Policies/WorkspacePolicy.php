@@ -11,10 +11,11 @@ class WorkspacePolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
-    {
-        return false;
-    }
+// كل مستخدم مسجل يقدر يشوف workspaces
+public function viewAny(User $user): bool
+{
+    return true;
+}
 
     /**
      * Determine whether the user can view the model.
@@ -35,11 +36,11 @@ class WorkspacePolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
-    {
-        return false;
-    }
-
+// كل مستخدم مسجل يقدر ينشئ workspace
+public function create(User $user): bool
+{
+    return true;
+}
     /**
      * Determine whether the user can update the model.
      */

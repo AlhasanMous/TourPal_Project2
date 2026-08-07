@@ -10,14 +10,16 @@ class WorkspaceService
     // كل الـ Workspaces تبع المستخدم (مالك + مشارك)
     public function getUserWorkspaces(int $userId): Collection
     {
-        return Workspace::with(['owner', 'participants'])
-            ->where('owner_user_id', $userId)
-            ->orWhereHas('participants', function ($q) use ($userId) {
-                $q->where('user_id', $userId)
-                  ->where('status', 'accepted');
-            })
-            ->latest()
-            ->get();
+       return Workspace::with(['owner', 'participants'])
+        ->where(function ($q) use ($userId) {        
+            $q->where('owner_user_id', $userId)
+              ->orWhereHas('participants', function ($q) use ($userId) {
+                  $q->where('user_id', $userId)
+                    ->where('status', 'accepted');
+              });
+        })
+        ->latest()
+        ->get();
     }
 
     public function create(array $data, int $ownerId): Workspace

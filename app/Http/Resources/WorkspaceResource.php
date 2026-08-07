@@ -22,7 +22,15 @@ class WorkspaceResource extends JsonResource
             'trip_start_date' => $this->trip_start_date,
             'trip_end_date'   => $this->trip_end_date,
             'is_public'       => $this->is_public,
-            'participants'    => UserResource::collection($this->whenLoaded('participants')),
+            'participants' => $this->whenLoaded('participants', fn() =>
+             $this->participants->map(fn($user) => [
+            'id'        => $user->id,
+            'name'      => $user->name,
+            'photo'     => $user->profile_photo,
+            'status'    => $user->pivot->status,      // ← مهم
+            'joined_at' => $user->pivot->joined_at,   // ← مفيد للـ Frontend
+    ])
+),
             'created_at'      => $this->created_at,
         ];
     }
