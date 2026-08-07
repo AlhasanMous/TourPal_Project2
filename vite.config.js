@@ -8,13 +8,23 @@ export default defineConfig({
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.jsx'],
             refresh: true,
+            detectTrojanHorse: false,
         }),
         tailwindcss(),
         react(),
     ],
+
     server: {
+        host: '127.0.0.1',
+        hmr: {
+            host: '127.0.0.1',
+        },
         watch: {
             ignored: ['**/storage/framework/views/**'],
         },
+    },
+
+    esbuild: {
+        jsx: 'automatic',
     },
 });

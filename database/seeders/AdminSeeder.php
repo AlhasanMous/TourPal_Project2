@@ -12,7 +12,7 @@ class AdminSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-   public function run(): void
+    public function run(): void
     {
         $admin = User::create([
             'name'          => 'TourPal Admin',
@@ -23,4 +23,3 @@ class AdminSeeder extends Seeder
         $admin->assignRole('admin');
     }
 }
-

@@ -13,7 +13,8 @@
 
     <!-- Styles / Scripts -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @viteReactRefresh
+        @vite(['resources/css/app.css', 'resources/js/app.jsx'])
     @else
         <style>
             /*! tailwindcss v4.0.7 | MIT License | https://tailwindcss.com */
@@ -1519,7 +1520,7 @@
     @endif
 
 
-    /* @vite(['resources/css/app.css', 'resources/js/app.jsx']) */
+
 </head>
 
 <body
@@ -1550,7 +1551,7 @@
     </header>
 
 
-    /* <div id="app"></div> */
+
 
 
     <div

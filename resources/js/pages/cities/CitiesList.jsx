@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import placeService from '../../services/placeService';
+import cityService from '../../services/cityService';
 import PageHeader from '../../components/layout/PageHeader';
 import DataTable from '../../components/tables/DataTable';
 import Loading from '../../components/common/Loading';
@@ -8,36 +8,36 @@ import ErrorMessage from '../../components/common/ErrorMessage';
 import Modal from '../../components/common/Modal';
 import Button from '../../components/common/Button';
 
-export default function PlacesList() {
-    const [places, setPlaces] = useState([]);
+export default function CitiesList() {
+    const [cities, setCities] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [deleting, setDeleting] = useState(null);
 
-    const fetchPlaces = async () => {
+    const fetchCities = async () => {
         setLoading(true);
         setError('');
 
         try {
-            const data = await placeService.getPlaces();
-            setPlaces(data.places?.data ?? []);
+            const data = await cityService.getAdminCities();
+            setCities(data.cities ?? []);
         } catch (err) {
-            setError('Failed to load places.');
+            setError('Failed to load cities.');
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchPlaces();
+        fetchCities();
     }, []);
 
     const handleDelete = async () => {
         try {
-            await placeService.deletePlace(deleting.id);
-            setPlaces((prev) => prev.filter((place) => place.id !== deleting.id));
+            await cityService.deleteCity(deleting.id);
+            setCities((prev) => prev.filter((city) => city.id !== deleting.id));
         } catch (err) {
-            setError('Failed to delete place.');
+            setError('Failed to delete city.');
         } finally {
             setDeleting(null);
         }
@@ -45,41 +45,32 @@ export default function PlacesList() {
 
     const columns = [
         { key: 'id', label: 'ID' },
-        { key: 'name_en', label: 'Name' },
-        { key: 'category', label: 'Category' },
-        {
-            key: 'city',
-            label: 'City',
-            render: (row) => row.city?.name_en ?? '-',
-        },
-        {
-            key: 'avg_rating',
-            label: 'Rating',
-            render: (row) => row.avg_rating ?? '-',
-        },
+        { key: 'name_ar', label: 'Name (AR)' },
+        { key: 'name_en', label: 'Name (EN)' },
+        { key: 'region', label: 'Region' },
     ];
 
     return (
         <div>
             <PageHeader
-                title="Places"
-                subtitle="Manage tourism places."
-                actionLabel="Add Place"
-                actionTo="/places/create"
+                title="Cities"
+                subtitle="Manage cities available on the platform."
+                actionLabel="Add City"
+                actionTo="/cities/create"
             />
 
-            <ErrorMessage message={error} onRetry={fetchPlaces} />
+            <ErrorMessage message={error} onRetry={fetchCities} />
 
             {loading ? (
                 <Loading />
             ) : (
                 <DataTable
                     columns={columns}
-                    data={places}
-                    emptyMessage="No places found."
+                    data={cities}
+                    emptyMessage="No cities found."
                     actions={(row) => (
                         <div className="flex justify-end gap-2">
-                            <Link to={`/places/${row.id}/edit`}>
+                            <Link to={`/cities/${row.id}/edit`}>
                                 <Button variant="secondary">Edit</Button>
                             </Link>
                             <Button
@@ -95,7 +86,7 @@ export default function PlacesList() {
 
             <Modal
                 isOpen={!!deleting}
-                title="Delete Place"
+                title="Delete City"
                 message={`Are you sure you want to delete "${deleting?.name_en}"?`}
                 onConfirm={handleDelete}
                 onCancel={() => setDeleting(null)}

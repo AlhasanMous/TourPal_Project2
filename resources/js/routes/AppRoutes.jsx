@@ -1,48 +1,50 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 
+import AuthLayout from '../layouts/AuthLayout';
 import DashboardLayout from '../layouts/DashboardLayout';
+import ProtectedRoute from '../components/common/ProtectedRoute';
 
+import Login from '../pages/auth/Login';
+import Register from '../pages/auth/Register';
+import ForgotPassword from '../pages/auth/ForgotPassword';
+import ResetPassword from '../pages/auth/ResetPassword';
 import Dashboard from '../pages/Dashboard';
-import Users from '../pages/Users/UsersList';
-import Places from '../pages/Places/PlacesList';
-// import Guides from '../pages/Guides';
-// import Accommodations from '../pages/Accommodations';
-// import Workspaces from '../pages/Workspaces';
-// import Bookings from '../pages/Bookings';
-// import Matching from '../pages/Matching';
-// import Messages from '../pages/Messages';
-// import Reviews from '../pages/Reviews';
-// import Wishlist from '../pages/Wishlist';
-// import Notifications from '../pages/Notifications';
+import CitiesList from '../pages/cities/CitiesList';
+import CreateCity from '../pages/cities/CreateCity';
+import EditCity from '../pages/cities/EditCity';
+import PlacesList from '../pages/places/PlacesList';
+import CreatePlace from '../pages/places/CreatePlace';
+import EditPlace from '../pages/places/EditPlace';
 
 export default function AppRoutes() {
     return (
         <Routes>
-            <Route element={<DashboardLayout />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/users" element={<Users />} />
-                <Route path="/places" element={<Places />} />
-                <Route path="/guides" element={<Guides />} />
-                <Route
-                    path="/accommodations"
-                    element={<Accommodations />}
-                />
-                <Route path="/workspaces" element={<Workspaces />} />
-                <Route path="/bookings" element={<Bookings />} />
-                <Route path="/matching" element={<Matching />} />
-                <Route path="/messages" element={<Messages />} />
-                <Route path="/reviews" element={<Reviews />} />
-                <Route path="/wishlist" element={<Wishlist />} />
-                <Route
-                    path="/notifications"
-                    element={<Notifications />}
-                />
+            <Route element={<AuthLayout />}>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
             </Route>
 
             <Route
-                path="/"
-                element={<Navigate to="/dashboard" replace />}
-            />
+                element={
+                    <ProtectedRoute>
+                        <DashboardLayout />
+                    </ProtectedRoute>
+                }
+            >
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/cities" element={<CitiesList />} />
+                <Route path="/cities/create" element={<CreateCity />} />
+                <Route path="/cities/:id/edit" element={<EditCity />} />
+                <Route path="/places" element={<PlacesList />} />
+                <Route path="/places/create" element={<CreatePlace />} />
+                <Route path="/places/:id/edit" element={<EditPlace />} />
+            </Route>
+
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
     );
 }
+
