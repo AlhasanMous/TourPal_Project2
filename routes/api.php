@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\WorkspaceController;
 use App\Http\Controllers\Api\WorkspaceParticipantController;
 use App\Http\Controllers\Api\Admin\WorkspaceController as AdminWorkspaceController;
+use App\Http\Controllers\Api\WorkspacePlaceController;
+use App\Http\Controllers\Api\WorkspaceTimelineController;
 // ─── Public Auth ─────────────────────────────────────────
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
@@ -28,11 +30,25 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('workspaces', WorkspaceController::class);
     // Workspace Participants
     Route::prefix('workspaces/{workspace}')->group(function () {
+        // Workspace Places
+    Route::get('places',            [WorkspacePlaceController::class, 'index']);
+    Route::post('places',           [WorkspacePlaceController::class, 'store']);
+    Route::delete('places/{place}', [WorkspacePlaceController::class, 'destroy']);
+       // Participants
     Route::post('invite',                    [WorkspaceParticipantController::class, 'invite']);
     Route::post('accept',                    [WorkspaceParticipantController::class, 'accept']);
     Route::post('decline',                   [WorkspaceParticipantController::class, 'decline']);
     Route::delete('participants/{userId}',   [WorkspaceParticipantController::class, 'remove']);
 });
+});
+     // workspace timeline
+Route::prefix('workspaces/{workspace}/timeline')->group(function () {
+    Route::get('/',                                    [WorkspaceTimelineController::class, 'index']);
+    Route::post('/',                                   [WorkspaceTimelineController::class, 'store']);
+    Route::put('/{item}',                              [WorkspaceTimelineController::class, 'update']);
+    Route::delete('/{item}',                           [WorkspaceTimelineController::class, 'destroy']);
+    Route::post('/{item}/participants',                [WorkspaceTimelineController::class, 'addParticipant']);
+    Route::delete('/{item}/participants/{userId}',     [WorkspaceTimelineController::class, 'removeParticipant']);
 });
 
 // ─── Admin only ──────────────────────────────────────────

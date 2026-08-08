@@ -21,8 +21,16 @@ class PlaceResource extends JsonResource
             'description_ar'       => $this->description_ar,
             'description_en'       => $this->description_en,
             'category'             => $this->category,
-           'main_image' => $this->images->where('is_main', true)->first()?->image_url,
-            'images'     => $this->whenLoaded('images', fn() => $this->images->pluck('image_url')),
+            'main_image' => $this->whenLoaded('images', fn() =>
+             $this->images->where('is_main', true)->first()?->image_url
+        ),
+            'images' => $this->whenLoaded('images', fn() =>
+             $this->images->map(fn($img) => [
+            'url'        => $img->image_url,
+            'is_main'    => $img->is_main,
+             'sort_order' => $img->sort_order,
+    ])
+),
             'avg_rating'           => $this->avg_rating,
             'visit_duration_hours' => $this->visit_duration_hours,
             'opening_hours'        => $this->opening_hours,
