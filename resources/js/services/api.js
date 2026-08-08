@@ -1,5 +1,10 @@
 import axios from 'axios';
 
+const clearAuthData = () => {
+    localStorage.removeItem('tourpal_token');
+    localStorage.removeItem('tourpal_user');
+};
+
 const api = axios.create({
     baseURL: '/api',
     headers: {
@@ -22,10 +27,14 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
-            localStorage.removeItem('tourpal_token');
-            localStorage.removeItem('tourpal_user');
-            window.location.href = '/login';
+        const token = localStorage.getItem('tourpal_token');
+
+        if (error.response?.status === 401 && token) {
+            clearAuthData();
+
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+            }
         }
 
         return Promise.reject(error);

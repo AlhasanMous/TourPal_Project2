@@ -1,23 +1,28 @@
 import api from './api';
 
 const login = async (credentials) => {
-    const response = await api.post('/auth/login', credentials);
-    return response.data;
+    const { data } = await api.post('/auth/login', credentials);
+    return data;
 };
 
-const register = async (data) => {
-    const response = await api.post('/auth/register', data);
-    return response.data;
+const register = async (userData) => {
+    const { data } = await api.post('/auth/register', userData);
+    return data;
 };
 
 const logout = async () => {
-    const response = await api.post('/auth/logout');
-    return response.data;
+    const { data } = await api.post('/auth/logout');
+    return data;
 };
 
 const me = async () => {
-    const response = await api.get('/auth/me');
-    return response.data;
+    const { data } = await api.get('/auth/me');
+    return data;
 };
 
-export default { login, register, logout, me };
+export default {
+    login,
+    register,
+    logout,
+    me,
+};

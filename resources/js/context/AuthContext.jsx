@@ -4,8 +4,51 @@ import authService from '../services/authService';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
+    // ===========================
+    // Initial State
+    // ===========================
+
+    const storedUser = localStorage.getItem('tourpal_user');
+
+    const [user, setUser] = useState(
+        storedUser ? JSON.parse(storedUser) : null
+    );
+
     const [loading, setLoading] = useState(true);
+
+    // ===========================
+    // Helpers
+    // ===========================
+
+    const isAuthenticated = !!user;
+
+    const hasRole = (role) => {
+        return user?.roles?.includes(role);
+    };
+
+    const isAdmin = () => hasRole('admin');
+
+    const setAuthenticatedUser = (currentUser, token) => {
+        localStorage.setItem('tourpal_token', token);
+
+        localStorage.setItem(
+            'tourpal_user',
+            JSON.stringify(currentUser)
+        );
+
+        setUser(currentUser);
+    };
+
+    const clearAuthData = () => {
+        localStorage.removeItem('tourpal_token');
+        localStorage.removeItem('tourpal_user');
+
+        setUser(null);
+    };
+
+    // ===========================
+    // Check Authentication
+    // ===========================
 
     useEffect(() => {
         const token = localStorage.getItem('tourpal_token');
@@ -19,47 +62,72 @@ export function AuthProvider({ children }) {
             .me()
             .then((data) => {
                 const currentUser = data.user;
-                localStorage.setItem('tourpal_user', JSON.stringify(currentUser));
+
+                localStorage.setItem(
+                    'tourpal_user',
+                    JSON.stringify(currentUser)
+                );
+
                 setUser(currentUser);
             })
             .catch(() => {
-                localStorage.removeItem('tourpal_token');
-                localStorage.removeItem('tourpal_user');
+                clearAuthData();
             })
-            .finally(() => setLoading(false));
+            .finally(() => {
+                setLoading(false);
+            });
     }, []);
+
+    // ===========================
+    // Authentication
+    // ===========================
 
     const login = async (credentials) => {
         const data = await authService.login(credentials);
-        const currentUser = data.user;
 
-        localStorage.setItem('tourpal_token', data.token);
-        localStorage.setItem('tourpal_user', JSON.stringify(currentUser));
+        setAuthenticatedUser(data.user, data.token);
 
-        setUser(currentUser);
-
-        return currentUser;
+        return data.user;
     };
 
     const logout = async () => {
         try {
             await authService.logout();
-        } catch {
-            // ignore logout errors
+        } catch (error) {
+            // Ignore logout API errors
         } finally {
-            localStorage.removeItem('tourpal_token');
-            localStorage.removeItem('tourpal_user');
-            setUser(null);
+            clearAuthData();
         }
     };
 
-    const isAdmin = () => {
-        const roles = user?.roles ?? [];
-        return roles.includes('admin');
+    const refreshUser = async () => {
+        const data = await authService.me();
+
+        localStorage.setItem(
+            'tourpal_user',
+            JSON.stringify(data.user)
+        );
+
+        setUser(data.user);
     };
 
+    // ===========================
+    // Provider
+    // ===========================
+
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout, isAdmin }}>
+        <AuthContext.Provider
+            value={{
+                user,
+                loading,
+                login,
+                logout,
+                refreshUser,
+                isAuthenticated,
+                hasRole,
+                isAdmin,
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );

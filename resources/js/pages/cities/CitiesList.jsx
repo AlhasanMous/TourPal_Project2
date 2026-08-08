@@ -1,97 +1,175 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import cityService from '../../services/cityService';
+
 import PageHeader from '../../components/layout/PageHeader';
 import DataTable from '../../components/tables/DataTable';
+import Button from '../../components/common/Button';
 import Loading from '../../components/common/Loading';
 import ErrorMessage from '../../components/common/ErrorMessage';
-import Modal from '../../components/common/Modal';
-import Button from '../../components/common/Button';
+
+import cityService from '../../services/cityService';
 
 export default function CitiesList() {
-    const [cities, setCities] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [deleting, setDeleting] = useState(null);
+const [cities, setCities] = useState([]);
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState('');
+const [search, setSearch] = useState('');
 
-    const fetchCities = async () => {
+
+const fetchCities = async () => {
+    try {
         setLoading(true);
         setError('');
 
-        try {
-            const data = await cityService.getAdminCities();
-            setCities(data.cities ?? []);
-        } catch (err) {
-            setError('Failed to load cities.');
-        } finally {
-            setLoading(false);
-        }
-    };
+        const data = await cityService.getAll();
+        setCities(data);
+    } catch (err) {
+        setError(
+            err.response?.data?.message ||
+            'Failed to load cities. Please try again.'
+        );
+    } finally {
+        setLoading(false);
+    }
+};
 
-    useEffect(() => {
-        fetchCities();
-    }, []);
+useEffect(() => {
+    fetchCities();
+}, []);
 
-    const handleDelete = async () => {
-        try {
-            await cityService.deleteCity(deleting.id);
-            setCities((prev) => prev.filter((city) => city.id !== deleting.id));
-        } catch (err) {
-            setError('Failed to delete city.');
-        } finally {
-            setDeleting(null);
-        }
-    };
+const filteredCities = useMemo(() => {
+    const searchTerm = search.trim().toLowerCase();
 
-    const columns = [
-        { key: 'id', label: 'ID' },
-        { key: 'name_ar', label: 'Name (AR)' },
-        { key: 'name_en', label: 'Name (EN)' },
-        { key: 'region', label: 'Region' },
-    ];
+    if (!searchTerm) {
+        return cities;
+    }
 
-    return (
-        <div>
-            <PageHeader
-                title="Cities"
-                subtitle="Manage cities available on the platform."
-                actionLabel="Add City"
-                actionTo="/cities/create"
-            />
-
-            <ErrorMessage message={error} onRetry={fetchCities} />
-
-            {loading ? (
-                <Loading />
-            ) : (
-                <DataTable
-                    columns={columns}
-                    data={cities}
-                    emptyMessage="No cities found."
-                    actions={(row) => (
-                        <div className="flex justify-end gap-2">
-                            <Link to={`/cities/${row.id}/edit`}>
-                                <Button variant="secondary">Edit</Button>
-                            </Link>
-                            <Button
-                                variant="danger"
-                                onClick={() => setDeleting(row)}
-                            >
-                                Delete
-                            </Button>
-                        </div>
-                    )}
-                />
-            )}
-
-            <Modal
-                isOpen={!!deleting}
-                title="Delete City"
-                message={`Are you sure you want to delete "${deleting?.name_en}"?`}
-                onConfirm={handleDelete}
-                onCancel={() => setDeleting(null)}
-                confirmText="Delete"
-            />
-        </div>
+    return cities.filter((city) =>
+        [
+            city.name_ar,
+            city.name_en,
+            city.region,
+            String(city.id),
+        ].some((value) =>
+            String(value ?? '').toLowerCase().includes(searchTerm)
+        )
     );
+}, [cities, search]);
+
+const handleDelete = async (city) => {
+    const confirmed = window.confirm(
+        `Are you sure you want to delete "${city.name_en}"?`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+        setError('');
+
+        await cityService.remove(city.id);
+
+        setCities((currentCities) =>
+            currentCities.filter((item) => item.id !== city.id)
+        );
+    } catch (err) {
+        setError(
+            err.response?.data?.message ||
+            'Failed to delete the city. Please try again.'
+        );
+    }
+};
+
+const columns = [
+    {
+        key: 'id',
+        label: 'ID',
+    },
+    {
+        key: 'name_ar',
+        label: 'Arabic Name',
+    },
+    {
+        key: 'name_en',
+        label: 'English Name',
+    },
+    {
+        key: 'region',
+        label: 'Region',
+    },
+];
+
+return (
+    <div>
+        <PageHeader
+            title="Cities"
+            subtitle="Manage cities available in TourPal."
+            actionLabel="Add City"
+            actionTo="/cities/create"
+        />
+
+        <ErrorMessage message={error} />
+
+        {!loading && (
+            <div className="mb-4 rounded-lg border bg-white p-4 shadow-sm">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex-1">
+                        <label
+                            htmlFor="city-search"
+                            className="mb-1 block text-sm font-medium text-gray-700"
+                        >
+                            Search Cities
+                        </label>
+
+                        <input
+                            id="city-search"
+                            type="text"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Search by ID, Arabic name, English name, or region..."
+                            className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+
+                    <div className="text-sm text-gray-500 sm:pt-6">
+                        Showing {filteredCities.length} of {cities.length} cities
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {loading ? (
+            <Loading message="Loading cities..." />
+        ) : (
+            <DataTable
+                columns={columns}
+                data={filteredCities}
+                emptyMessage={
+                    search.trim()
+                        ? 'No cities match your search.'
+                        : 'No cities found.'
+                }
+                actions={(city) => (
+                    <div className="flex justify-end gap-2">
+                        <Link to={`/cities/${city.id}/edit`}>
+                            <Button variant="secondary">
+                                Edit
+                            </Button>
+                        </Link>
+
+                        <Button
+                            variant="danger"
+                            onClick={() => handleDelete(city)}
+                        >
+                            Delete
+                        </Button>
+                    </div>
+                )}
+            />
+        )}
+    </div>
+);
+
+
 }

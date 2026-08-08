@@ -1,40 +1,34 @@
 import api from './api';
 
-const getCities = async () => {
-    const response = await api.get('/cities');
-    return response.data;
+const getAll = async () => {
+    const { data } = await api.get('/admin/cities');
+    return data.cities;
 };
 
-const getAdminCities = async (params = {}) => {
-    const response = await api.get('/admin/cities', { params });
-    return response.data;
+const getById = async (id) => {
+    const { data } = await api.get(`/admin/cities/${id}`);
+    return data.city;
 };
 
-const getCity = async (id) => {
-    const response = await api.get(`/admin/cities/${id}`);
-    return response.data;
+const create = async (cityData) => {
+    const { data } = await api.post('/admin/cities', cityData);
+    return data;
 };
 
-const createCity = async (data) => {
-    const response = await api.post('/admin/cities', data);
-    return response.data;
+const update = async (id, cityData) => {
+    const { data } = await api.put(`/admin/cities/${id}`, cityData);
+    return data;
 };
 
-const updateCity = async (id, data) => {
-    const response = await api.put(`/admin/cities/${id}`, data);
-    return response.data;
-};
-
-const deleteCity = async (id) => {
-    const response = await api.delete(`/admin/cities/${id}`);
-    return response.data;
+const remove = async (id) => {
+    const { data } = await api.delete(`/admin/cities/${id}`);
+    return data;
 };
 
 export default {
-    getCities,
-    getAdminCities,
-    getCity,
-    createCity,
-    updateCity,
-    deleteCity,
+    getAll,
+    getById,
+    create,
+    update,
+    remove,
 };
