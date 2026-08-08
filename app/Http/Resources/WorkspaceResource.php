@@ -22,6 +22,7 @@ class WorkspaceResource extends JsonResource
             'trip_start_date' => $this->trip_start_date,
             'trip_end_date'   => $this->trip_end_date,
             'is_public'       => $this->is_public,
+             'participants_count' => $this->whenCounted('participants'), // ← جديد
             'participants' => $this->whenLoaded('participants', fn() =>
              $this->participants->map(fn($user) => [
             'id'        => $user->id,
@@ -32,6 +33,7 @@ class WorkspaceResource extends JsonResource
     ])
 ),
             'created_at'      => $this->created_at,
+            'deleted_at'         => $this->deleted_at, // ← للادمن
         ];
     }
 }

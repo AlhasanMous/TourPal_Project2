@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\WorkspaceController;
 use App\Http\Controllers\Api\WorkspaceParticipantController;
+use App\Http\Controllers\Api\Admin\WorkspaceController as AdminWorkspaceController;
 // ─── Public Auth ─────────────────────────────────────────
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
@@ -38,4 +39,8 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
     Route::apiResource('cities', CityController::class);
     Route::apiResource('places', PlaceController::class);
+// Workspaces — للادمن (عرض + حذف فقط)
+    Route::get('workspaces',                [AdminWorkspaceController::class, 'index']);
+    Route::get('workspaces/{workspace}',    [AdminWorkspaceController::class, 'show']);
+    Route::delete('workspaces/{workspace}', [AdminWorkspaceController::class, 'destroy']);
 });
