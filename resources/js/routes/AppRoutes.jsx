@@ -15,6 +15,8 @@ import EditCity from '../pages/cities/EditCity';
 import PlacesList from '../pages/places/PlacesList';
 import CreatePlace from '../pages/places/CreatePlace';
 import EditPlace from '../pages/places/EditPlace';
+import WorkspacesList from '../pages/workspaces/WorkspacesList';
+import WorkspaceDetails from '../pages/workspaces/WorkspaceDetails';
 
 export default function AppRoutes() {
     return (
@@ -40,7 +42,10 @@ export default function AppRoutes() {
                 <Route path="/places" element={<PlacesList />} />
                 <Route path="/places/create" element={<CreatePlace />} />
                 <Route path="/places/:id/edit" element={<EditPlace />} />
-            </Route>
+          <Route path="/workspaces" element={<WorkspacesList />} />
+<Route path="/workspaces/:id" element={<WorkspaceDetails />} />
+
+</Route>
 
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />

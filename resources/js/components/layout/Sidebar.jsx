@@ -4,6 +4,7 @@ const menuItems = [
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'Cities', path: '/cities' },
     { name: 'Places', path: '/places' },
+    { name: 'Workspaces', path: '/workspaces' },
 ];
 
 export default function Sidebar() {
