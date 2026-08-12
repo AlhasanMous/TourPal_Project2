@@ -18,6 +18,9 @@ import EditPlace from '../pages/places/EditPlace';
 import WorkspacesList from '../pages/workspaces/WorkspacesList';
 import WorkspaceDetails from '../pages/workspaces/WorkspaceDetails';
 
+import UsersList from '../pages/users/UsersList';
+import EditUser from '../pages/users/EditUser';
+import ViewUser from '../pages/users/ViewUser';
 export default function AppRoutes() {
     return (
         <Routes>
@@ -32,10 +35,14 @@ export default function AppRoutes() {
                 element={
                     <ProtectedRoute>
                         <DashboardLayout />
+
                     </ProtectedRoute>
                 }
             >
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/users" element={<UsersList />} />
+                <Route path="/users/:id" element={<ViewUser />} />
+                <Route path="/users/:id/edit" element={<EditUser />} />
                 <Route path="/cities" element={<CitiesList />} />
                 <Route path="/cities/create" element={<CreateCity />} />
                 <Route path="/cities/:id/edit" element={<EditCity />} />
@@ -43,6 +50,7 @@ export default function AppRoutes() {
                 <Route path="/places/create" element={<CreatePlace />} />
                 <Route path="/places/:id/edit" element={<EditPlace />} />
           <Route path="/workspaces" element={<WorkspacesList />} />
+
 <Route path="/workspaces/:id" element={<WorkspaceDetails />} />
 
 </Route>

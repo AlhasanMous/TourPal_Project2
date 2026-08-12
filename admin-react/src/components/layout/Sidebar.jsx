@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 
 const menuItems = [
     { name: 'Dashboard', path: '/dashboard' },
+       { name: 'Users', path: '/users' },
     { name: 'Cities', path: '/cities' },
     { name: 'Places', path: '/places' },
     { name: 'Workspaces', path: '/workspaces' },
