@@ -53,9 +53,15 @@ class Guide extends Model
                 ->orderBy('sort_order');
 }
 
+// public function mainImage(): MorphOne
+// {
+//     return $this->morphMany(Image::class, 'imageable')
+//                 ->where('is_main', true);
+// }
+// الصح ✅
 public function mainImage(): MorphOne
 {
-    return $this->morphMany(Image::class, 'imageable')
+    return $this->morphOne(Image::class, 'imageable')
                 ->where('is_main', true);
 }
 }

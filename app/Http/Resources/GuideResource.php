@@ -22,7 +22,10 @@ class GuideResource extends JsonResource
             'specializations'     => $this->specializations,
             'availability'        => $this->availability,
             'verified_at'         => $this->verified_at,
-            'main_image'          => $this->images->where('is_main', true)->first()?->image_url,
+          // الصح ✅
+            'main_image' => $this->whenLoaded('images', 
+            fn() => $this->images->where('is_main', true)->first()?->image_url
+             ),
 
         ];
     }
