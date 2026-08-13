@@ -11,6 +11,9 @@ use App\Http\Controllers\Api\Admin\WorkspaceController as AdminWorkspaceControll
 use App\Http\Controllers\Api\WorkspacePlaceController;
 use App\Http\Controllers\Api\WorkspaceTimelineController;
 use App\Http\Controllers\Api\WorkspaceSuggestionController;
+use App\Http\Controllers\Api\Admin\UserController;
+
+
 
 // ─── Public Auth ─────────────────────────────────────────
 Route::prefix('auth')->group(function () {
@@ -65,6 +68,14 @@ Route::prefix('workspaces/{workspace}/suggestions')->group(function () {
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
     Route::apiResource('cities', CityController::class);
     Route::apiResource('places', PlaceController::class);
+     // Users Management
+    Route::get('users',                           [UserController::class, 'index']);
+    Route::get('users/{user}',                    [UserController::class, 'show']);
+    Route::put('users/{user}',                    [UserController::class, 'update']);
+    Route::delete('users/{user}',                 [UserController::class, 'destroy']);
+    Route::post('users/{id}/restore',             [UserController::class, 'restore']);
+    Route::post('users/{user}/toggle-verification',[UserController::class, 'toggleVerification']);
+
 /// Admin Workspaces
     Route::prefix('workspaces')->group(function () {
         Route::get('/',                          [AdminWorkspaceController::class, 'index']);
