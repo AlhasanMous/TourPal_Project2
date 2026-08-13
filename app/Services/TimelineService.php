@@ -24,36 +24,35 @@ class TimelineService
     // ─────────────────────────────────────────
     // إضافة item للـ Timeline
     // ─────────────────────────────────────────
-    public function addItem(Workspace $workspace, array $data): WorkspaceTimelineItem
-    {
-        // تحقق من الـ reference_id في قاعدة البيانات
-        if ($data['item_type'] !== 'note') {
-            $this->validateReference($data['item_type'], $data['reference_id']);
-        }
-
-        // إذا ما حدد order_in_day — احسبه تلقائياً
-        if (empty($data['order_in_day'])) {
-            $data['order_in_day'] = $this->getNextOrder(
-                $workspace->id,
-                $data['planned_date']
-            );
-        }
-
-        return DB::transaction(function () use ($workspace, $data) {
-            return WorkspaceTimelineItem::create([
-                'workspace_id'  => $workspace->id,
-                'planned_date'  => $data['planned_date'],
-                'planned_time'  => $data['planned_time'] ?? null,
-                'order_in_day'  => $data['order_in_day'],
-                'item_type'     => $data['item_type'],
-                'reference_id'  => $data['reference_id'] ?? null,
-                'label'         => $data['label'] ?? null,
-                'notes'         => $data['notes'] ?? null,
-                'added_by' => $workspace->owner_user_id,
-            ]);
-        });
+public function addItem(Workspace $workspace, array $data,?int $addedBy = null): WorkspaceTimelineItem
+{
+    // تحقق من الـ reference_id في قاعدة البيانات
+    if ($data['item_type'] !== 'note') {
+        $this->validateReference($data['item_type'], $data['reference_id']);
     }
 
+    // احسبه تلقائياً إذا ما حدد
+    if (empty($data['order_in_day'])) {
+        $data['order_in_day'] = $this->getNextOrder(
+            $workspace->id,
+            $data['planned_date']
+        );
+    }
+
+    return DB::transaction(function () use ($workspace, $data, $addedBy) {
+        return WorkspaceTimelineItem::create([
+            'workspace_id'  => $workspace->id,
+            'planned_date'  => $data['planned_date'],
+            'planned_time'  => $data['planned_time'] ?? null,
+            'order_in_day'  => $data['order_in_day'],
+            'item_type'     => $data['item_type'],
+            'reference_id'  => $data['reference_id'] ?? null,
+            'label'         => $data['label'] ?? null,
+            'notes'         => $data['notes'] ?? null,
+            'added_by'      => $addedBy ?? $workspace->owner_user_id,
+        ]);
+    });
+}
     // ─────────────────────────────────────────
     // تعديل item
     // ─────────────────────────────────────────
