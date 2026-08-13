@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\WorkspaceParticipantController;
 use App\Http\Controllers\Api\Admin\WorkspaceController as AdminWorkspaceController;
 use App\Http\Controllers\Api\WorkspacePlaceController;
 use App\Http\Controllers\Api\WorkspaceTimelineController;
+use App\Http\Controllers\Api\WorkspaceSuggestionController;
+
 // ─── Public Auth ─────────────────────────────────────────
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
@@ -51,12 +53,28 @@ Route::prefix('workspaces/{workspace}/timeline')->group(function () {
     Route::delete('/{item}/participants/{userId}',     [WorkspaceTimelineController::class, 'removeParticipant']);
 });
 
+// Workspace Suggestions
+Route::prefix('workspaces/{workspace}/suggestions')->group(function () {
+    Route::get('/',                        [WorkspaceSuggestionController::class, 'index']);
+    Route::get('/pending',                 [WorkspaceSuggestionController::class, 'pending']);
+    Route::post('/',                       [WorkspaceSuggestionController::class, 'store']);
+    Route::post('/{suggestion}/respond',   [WorkspaceSuggestionController::class, 'respond']);
+});
+
 // ─── Admin only ──────────────────────────────────────────
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
     Route::apiResource('cities', CityController::class);
     Route::apiResource('places', PlaceController::class);
-// Workspaces — للادمن (عرض + حذف فقط)
-    Route::get('workspaces',                [AdminWorkspaceController::class, 'index']);
-    Route::get('workspaces/{workspace}',    [AdminWorkspaceController::class, 'show']);
-    Route::delete('workspaces/{workspace}', [AdminWorkspaceController::class, 'destroy']);
+/// Admin Workspaces
+    Route::prefix('workspaces')->group(function () {
+        Route::get('/',                          [AdminWorkspaceController::class, 'index']);
+        Route::get('/{workspace}',               [AdminWorkspaceController::class, 'show']);
+        Route::delete('/{workspace}',            [AdminWorkspaceController::class, 'destroy']);
+        Route::get('/{workspace}/participants',  [AdminWorkspaceController::class, 'participants']);
+        Route::get('/{workspace}/places',        [AdminWorkspaceController::class, 'places']);
+        Route::get('/{workspace}/timeline',      [AdminWorkspaceController::class, 'timeline']);
+        Route::get('/{workspace}/suggestions',   [AdminWorkspaceController::class, 'suggestions']);
+    });
 });
+
+

@@ -121,8 +121,7 @@ class WorkspaceTimelineController extends Controller
             ], 403);
         }
 
-        $this->timelineService->addParticipant($item, $request->user_id);
-
+        $this->timelineService->addParticipant($item, $request->integer('user_id'));
         return response()->json([
             'message' => 'تمت إضافة المشارك للنشاط',
         ]);

@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
     AdminSeeder::class,
     SyriaDataSeeder::class,
     ImageSeeder::class, // ← لازم يكون هون
+        TransportSeeder::class,
 ]);
         // User::factory(10)->create();
 

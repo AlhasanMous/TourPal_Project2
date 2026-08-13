@@ -21,8 +21,9 @@ class StoreTimelineItemRequest extends FormRequest
             'item_type'    => ['required', 'in:place,accommodation,transport,note'],
 
             // مطلوب لكل شي ما عدا note
-            'reference_id' => ['required_if:item_type,place,accommodation,transport', 'nullable', 'integer', 'min:1'],
-
+            //'reference_id' => ['required_if:item_type,place,accommodation,transport', 'nullable', 'integer', 'min:1'],
+            // بعد ✅ — required ما لم يكون note
+            'reference_id' => ['required_unless:item_type,note', 'nullable', 'integer', 'min:1'],
             'label'        => ['nullable', 'string', 'max:500'],
             'notes'        => ['nullable', 'string', 'max:2000'],
         ];
