@@ -23,6 +23,7 @@ const navigate = useNavigate();
 
 const [cities, setCities] = useState([]);
 const [loading, setLoading] = useState(true);
+const [currentImage, setCurrentImage] = useState(null);
 
 const [form, setForm] = useState({
     name_ar: '',
@@ -33,6 +34,7 @@ const [form, setForm] = useState({
     category: '',
     visit_duration_hours: 1,
     opening_hours: {},
+    image: null,
 });
 
 const [errors, setErrors] = useState({});
@@ -49,20 +51,28 @@ useEffect(() => {
             ]);
 
             const place = placeData.place;
-
+console.log('PLACE DATA:', place);
             setCities(citiesData ?? []);
+if (place.images && place.images.length > 0) {
 
-            setForm({
-                name_ar: place.name_ar ?? '',
-                name_en: place.name_en ?? '',
-                description_ar: place.description_ar ?? '',
-                description_en: place.description_en ?? '',
-                city_id: place.city?.id ?? place.city_id ?? '',
-                category: place.category ?? '',
-                visit_duration_hours:
-                    place.visit_duration_hours ?? 1,
-                opening_hours: place.opening_hours ?? {},
-            });
+    const mainImage = place.images.find(
+        (img) => img.is_main
+    ) || place.images[0];
+
+    setCurrentImage(mainImage.url);
+}
+           setForm({
+    name_ar: place.name_ar ?? '',
+    name_en: place.name_en ?? '',
+    description_ar: place.description_ar ?? '',
+    description_en: place.description_en ?? '',
+    city_id: place.city?.id ?? place.city_id ?? '',
+    category: place.category ?? '',
+    visit_duration_hours:
+        place.visit_duration_hours ?? 1,
+    opening_hours: place.opening_hours ?? {},
+    image: null,
+});
         } catch (err) {
             setGlobalError(
                 err.response?.data?.message ||
@@ -95,7 +105,14 @@ const handleChange = (e) => {
 
     setGlobalError('');
 };
+const handleImageChange = (e) => {
+    const file = e.target.files[0];
 
+    setForm((prev) => ({
+        ...prev,
+        image: file,
+    }));
+};
 // Submit update
 const handleSubmit = async (e) => {
     e.preventDefault();
@@ -105,16 +122,26 @@ const handleSubmit = async (e) => {
     setGlobalError('');
 
     try {
-        const payload = {
-            ...form,
-            city_id: Number(form.city_id),
-            visit_duration_hours: Number(
-                form.visit_duration_hours
-            ),
-        };
+       const formData = new FormData();
 
-        await placeService.updatePlace(id, payload);
+formData.append('name_ar', form.name_ar);
+formData.append('name_en', form.name_en);
+formData.append('description_ar', form.description_ar);
+formData.append('description_en', form.description_en);
+formData.append('city_id', Number(form.city_id));
+formData.append('category', form.category);
 
+formData.append(
+    'visit_duration_hours',
+    Number(form.visit_duration_hours)
+);
+
+if (form.image) {
+    formData.append('image', form.image);
+}
+
+
+await placeService.updatePlace(id, formData);
         navigate('/places');
     } catch (err) {
         if (err.response?.status === 422) {
@@ -265,6 +292,68 @@ return (
                         )}
                     </div>
                 </div>
+
+
+
+
+
+<div className="mb-4">
+
+    <label className="mb-2 block text-sm font-medium text-gray-700">
+        Current Image
+    </label>
+
+
+    {currentImage ? (
+        <img
+            src={currentImage}
+            alt="Current Place"
+            className="mb-4 h-48 w-48 rounded-lg border object-cover"
+            onError={(e) => {
+                e.target.src = '/images/no-image.png';
+            }}
+        />
+    ) : (
+        <p className="mb-4 text-sm text-gray-500">
+            No image available
+        </p>
+    )}
+
+
+    <label className="mb-1 block text-sm font-medium text-gray-700">
+        Change Place Image
+    </label>
+
+
+    <input
+        type="file"
+        accept="image/*"
+        onChange={handleImageChange}
+        className="w-full rounded border border-gray-300 px-3 py-2"
+    />
+
+
+    {form.image && (
+        <div className="mt-3">
+
+            <p className="text-sm text-gray-500">
+                New image: {form.image.name}
+            </p>
+
+            <img
+                src={URL.createObjectURL(form.image)}
+                alt="New Preview"
+                className="mt-2 h-48 w-48 rounded-lg border object-cover"
+            />
+
+        </div>
+    )}
+
+</div>
+
+
+
+
 
                 {/* Arabic Description */}
                 <div className="mb-4">

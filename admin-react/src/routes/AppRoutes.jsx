@@ -17,6 +17,10 @@ import CreatePlace from '../pages/places/CreatePlace';
 import EditPlace from '../pages/places/EditPlace';
 import WorkspacesList from '../pages/workspaces/WorkspacesList';
 import WorkspaceDetails from '../pages/workspaces/WorkspaceDetails';
+import WorkspaceTimeline from '../pages/workspaces/WorkspaceTimeline';
+import WorkspaceParticipants from '../pages/workspaces/WorkspaceParticipants';
+import WorkspaceSuggestions from '../pages/workspaces/WorkspaceSuggestions';
+import WorkspacePlaces from '../pages/workspaces/WorkspacePlaces';
 
 import UsersList from '../pages/users/UsersList';
 import EditUser from '../pages/users/EditUser';
@@ -50,7 +54,22 @@ export default function AppRoutes() {
                 <Route path="/places/create" element={<CreatePlace />} />
                 <Route path="/places/:id/edit" element={<EditPlace />} />
           <Route path="/workspaces" element={<WorkspacesList />} />
-
+<Route
+    path="/workspaces/:id/timeline"
+    element={<WorkspaceTimeline />}
+/>
+<Route
+    path="/workspaces/:id/suggestions"
+    element={<WorkspaceSuggestions />}
+/>
+<Route
+    path="/workspaces/:id/participants"
+    element={<WorkspaceParticipants />}
+/>
+<Route
+ path="/workspaces/:id/places"
+ element={<WorkspacePlaces />}
+/>
 <Route path="/workspaces/:id" element={<WorkspaceDetails />} />
 
 </Route>

@@ -72,7 +72,6 @@ class WorkspaceSuggestionController extends Controller
                     $suggestion->load('suggester')
                 ),
             ], 201);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage(),
@@ -103,7 +102,6 @@ class WorkspaceSuggestionController extends Controller
                 'message'    => $message,
                 'suggestion' => new WorkspaceSuggestionResource($suggestion),
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage(),

@@ -230,9 +230,21 @@ export default function WorkspacesList() {
                                     to={`/workspaces/${workspace.id}`}
                                 >
                                     <Button variant="secondary">
-                                        View
+                                        View Details
                                     </Button>
                                 </Link>
+
+
+  {/* TimeLine */}
+  <Link
+      to={`/workspaces/${workspace.id}/timeline`}
+  >
+      <Button variant="secondary">
+        View Timeline
+      </Button>
+  </Link>
+
+
 
                                 {/* Delete */}
                                 <Button

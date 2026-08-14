@@ -11,12 +11,30 @@ const getPlace = async (id) => {
 };
 
 const createPlace = async (data) => {
-    const response = await api.post('/admin/places', data);
+    const response = await api.post(
+        '/admin/places',
+        data,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }
+    );
+
     return response.data;
 };
 
 const updatePlace = async (id, data) => {
-    const response = await api.put(`/admin/places/${id}`, data);
+    const response = await api.post(
+        `/admin/places/${id}?_method=PUT`,
+        data,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }
+    );
+
     return response.data;
 };
 

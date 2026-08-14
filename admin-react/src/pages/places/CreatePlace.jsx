@@ -33,8 +33,25 @@ const [form, setForm] = useState({
     category: '',
     visit_duration_hours: 1,
     opening_hours: {},
+    image: null,
+    image_url: '',
 });
+const handleImageChange = (e) => {
+    const file = e.target.files[0];
 
+    setForm((prev) => ({
+        ...prev,
+        image: file,
+        image_url: '',
+    }));
+};
+const handleImageUrlChange = (e) => {
+    setForm((prev) => ({
+        ...prev,
+        image_url: e.target.value,
+        image: null,
+    }));
+};
 const [errors, setErrors] = useState({});
 const [globalError, setGlobalError] = useState('');
 const [isSubmitting, setIsSubmitting] = useState(false);
@@ -88,40 +105,84 @@ const handleSubmit = async (e) => {
     setGlobalError('');
 
     try {
-        const payload = {
-            ...form,
-            city_id: Number(form.city_id),
-            visit_duration_hours: Number(
-                form.visit_duration_hours
-            ),
-        };
+       const formData = new FormData();
 
-        await placeService.createPlace(payload);
+formData.append('name_ar', form.name_ar);
+formData.append('name_en', form.name_en);
+formData.append('description_ar', form.description_ar);
+formData.append('description_en', form.description_en);
+formData.append('city_id', Number(form.city_id));
+formData.append('category', form.category);
+formData.append(
+    'visit_duration_hours',
+    Number(form.visit_duration_hours)
+);
+
+if (form.image) {
+    formData.append('image', form.image);
+} else if (form.image_url?.trim()) {
+    formData.append('image_url', form.image_url.trim());
+}
+
+await placeService.createPlace(formData);
+
+
 
         navigate('/places');
+    // } catch (err) {
+    //     if (err.response?.status === 422) {
+    //         const serverErrors =
+    //             err.response.data.errors ?? {};
+
+    //         const mappedErrors = {};
+
+    //         Object.entries(serverErrors).forEach(
+    //             ([key, messages]) => {
+    //                 mappedErrors[key] = Array.isArray(messages)
+    //                     ? messages[0]
+    //                     : messages;
+    //             }
+    //         );
+
+    //         setErrors(mappedErrors);
+    //     } else {
+    //         setGlobalError(
+    //             err.response?.data?.message ||
+    //                 'Failed to create place. Please try again.'
+    //         );
+    //     }
+    // }
     } catch (err) {
-        if (err.response?.status === 422) {
-            const serverErrors =
-                err.response.data.errors ?? {};
 
-            const mappedErrors = {};
+    console.log('CREATE PLACE ERROR:', err.response);
 
-            Object.entries(serverErrors).forEach(
-                ([key, messages]) => {
-                    mappedErrors[key] = Array.isArray(messages)
-                        ? messages[0]
-                        : messages;
-                }
-            );
+    if (err.response?.status === 422) {
 
-            setErrors(mappedErrors);
-        } else {
-            setGlobalError(
-                err.response?.data?.message ||
-                    'Failed to create place. Please try again.'
-            );
-        }
-    } finally {
+        const serverErrors =
+            err.response.data.errors ?? {};
+
+        const mappedErrors = {};
+
+        Object.entries(serverErrors).forEach(
+            ([key, messages]) => {
+                mappedErrors[key] = Array.isArray(messages)
+                    ? messages[0]
+                    : messages;
+            }
+        );
+
+        setErrors(mappedErrors);
+
+    } else {
+
+        setGlobalError(
+            err.response?.data?.message ||
+            err.message ||
+            'Failed to create place.'
+        );
+    }
+}
+    finally {
         setIsSubmitting(false);
     }
 };
@@ -249,6 +310,38 @@ return (
                         )}
                     </div>
                 </div>
+
+
+
+
+
+<div className="mb-4">
+    <label className="mb-1 block text-sm font-medium text-gray-700">
+        Place Image
+    </label>
+
+    <input
+        type="file"
+        accept="image/*"
+        onChange={handleImageChange}
+        className="w-full rounded border border-gray-300 px-3 py-2"
+    />
+
+    {form.image && (
+        <p className="mt-2 text-sm text-gray-500">
+            Selected: {form.image.name}
+        </p>
+    )}
+
+    {errors.image && (
+        <p className="mt-1 text-sm text-red-600">
+            {errors.image}
+        </p>
+    )}
+</div>
+
+
+
 
                 {/* Arabic Description */}
                 <div className="mb-4">
