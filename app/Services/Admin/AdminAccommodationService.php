@@ -1,0 +1,111 @@
+<?php
+
+namespace App\Services\Admin;
+
+use App\Models\Accommodation;
+use App\Models\Notification;
+use App\Models\User;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
+
+class AdminAccommodationService
+{
+    public function getAll(array $filters = []): LengthAwarePaginator
+    {
+        $query = Accommodation::with(['host', 'city', 'images'])
+                              ->withCount(['bookings', 'reviews']);
+
+        if (!empty($filters['status'])) {
+            $query->where('verification_status', $filters['status']);
+        }
+
+        if (!empty($filters['city_id'])) {
+            $query->where('city_id', $filters['city_id']);
+        }
+
+        if (!empty($filters['type'])) {
+            $query->where('type', $filters['type']);
+        }
+
+        if (!empty($filters['search'])) {
+            $query->where('name', 'like', '%' . $filters['search'] . '%');
+        }
+
+        return $query->latest()->paginate(20);
+    }
+
+    public function findById(int $id): Accommodation
+    {
+        return Accommodation::with(['host', 'city', 'images'])
+                            ->withCount(['bookings', 'reviews'])
+                            ->findOrFail($id);
+    }
+
+    public function getPending(): LengthAwarePaginator
+    {
+        return Accommodation::with(['host', 'city'])
+            ->where('verification_status', 'pending')
+            ->latest()
+            ->paginate(20);
+    }
+
+    public function create(array $data): Accommodation
+    {
+        return DB::transaction(function () use ($data) {
+            $accommodation = Accommodation::create($data);
+
+            $host = User::findOrFail($data['host_user_id']);
+            if (!$host->hasRole('host')) {
+                $host->assignRole('host');
+            }
+
+            return $accommodation;
+        });
+    }
+
+    public function verify(Accommodation $accommodation, string $action, ?string $reason): Accommodation
+    {
+        if ($accommodation->verification_status === 'verified' && $action === 'verify') {
+            throw new \Exception('هذه الإقامة محققة مسبقاً');
+        }
+
+        DB::transaction(function () use ($accommodation, $action, $reason) {
+            if ($action === 'verify') {
+                $accommodation->update([
+                    'verification_status' => 'verified',
+                    'verified_at'         => now(),
+                    'rejection_reason'    => null,
+                ]);
+
+                Notification::create([
+                    'user_id' => $accommodation->host_user_id,
+                    'type'    => 'accommodation_verified',
+                    'data'    => [
+                        'accommodation_id'   => $accommodation->id,
+                        'accommodation_name' => $accommodation->name,
+                        'message'            => 'تهانينا! تم اعتماد إقامتك',
+                    ],
+                ]);
+            } else {
+                $accommodation->update([
+                    'verification_status' => 'rejected',
+                    'verified_at'         => null,
+                    'rejection_reason'    => $reason,
+                ]);
+
+                Notification::create([
+                    'user_id' => $accommodation->host_user_id,
+                    'type'    => 'accommodation_rejected',
+                    'data'    => [
+                        'accommodation_id'   => $accommodation->id,
+                        'accommodation_name' => $accommodation->name,
+                        'message'            => 'نأسف، لم يتم اعتماد إقامتك',
+                        'rejection_reason'   => $reason,
+                    ],
+                ]);
+            }
+        });
+
+        return $accommodation->fresh(['host', 'city']);
+    }
+}
