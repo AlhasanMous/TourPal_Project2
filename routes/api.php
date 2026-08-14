@@ -13,6 +13,10 @@ use App\Http\Controllers\Api\WorkspaceTimelineController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\GuideBookingController;
 use App\Http\Controllers\Api\GuideController;
+use App\Http\Controllers\Api\Admin\GuideController as AdminGuideController;
+use App\Http\Controllers\Api\GuideProfileController;
+use App\Http\Controllers\Api\Admin\AccommodationController as AdminAccommodationController;
+
 // ─────────────────────────────────────────────────────────
 // Public — Auth
 // ─────────────────────────────────────────────────────────
@@ -40,6 +44,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // Auth
     Route::post('auth/logout', [AuthController::class, 'logout']);
     Route::get('auth/me',      [AuthController::class, 'me']);
+
+    // Guide Profile
+    Route::prefix('guide')->group(function () {
+    Route::post('profile', [GuideProfileController::class, 'store']);
+    Route::get('profile',  [GuideProfileController::class, 'show']);
+    Route::put('profile',  [GuideProfileController::class, 'update']);
+});
 
     // Workspaces CRUD
     Route::apiResource('workspaces', WorkspaceController::class);
@@ -85,7 +96,7 @@ Route::middleware('auth:sanctum')->group(function () {
 // ─────────────────────────────────────────────────────────
 // Admin only — auth:sanctum + role:admin
 // ─────────────────────────────────────────────────────────
-Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
+    Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
 
     // Cities + Places CRUD
     Route::apiResource('cities', CityController::class);
@@ -109,4 +120,17 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
         Route::get('/{workspace}/timeline',    [AdminWorkspaceController::class, 'timeline']);
         Route::get('/{workspace}/suggestions', [AdminWorkspaceController::class, 'suggestions']);
     });
-});
+    // Admin Guides
+        Route::get('guides/pending',          [AdminGuideController::class, 'pending']);
+        Route::get('guides',                  [AdminGuideController::class, 'index']);
+        Route::post('guides',                 [AdminGuideController::class, 'store']);
+        Route::get('guides/{guide}',          [AdminGuideController::class, 'show']);
+        Route::post('guides/{guide}/verify',  [AdminGuideController::class, 'verify']);
+
+    // Admin Accommodations
+        Route::get('accommodations/pending',                      [AdminAccommodationController::class, 'pending']);
+        Route::get('accommodations',                              [AdminAccommodationController::class, 'index']);
+        Route::post('accommodations',                             [AdminAccommodationController::class, 'store']);
+        Route::get('accommodations/{accommodation}',              [AdminAccommodationController::class, 'show']);
+        Route::post('accommodations/{accommodation}/verify',      [AdminAccommodationController::class, 'verify']);
+    });
