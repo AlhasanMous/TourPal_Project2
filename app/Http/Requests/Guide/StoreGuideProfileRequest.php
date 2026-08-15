@@ -8,14 +8,16 @@ class StoreGuideProfileRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->hasRole('guide');
+        return $this->user()->hasRole('guide', 'api');
     }
 
     public function rules(): array
     {
         return [
             'city_id'         => ['required', 'integer', 'exists:cities,id'],
-            'specializations' => ['nullable', 'string', 'max:500'],
+            'specializations' => ['required', 'array', 'min:1'],
+'specializations.*' => ['required', 'string', 'max:100'],
+           
             'availability'    => ['nullable', 'array'],
         ];
     }

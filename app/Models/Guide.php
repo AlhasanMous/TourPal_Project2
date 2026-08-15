@@ -23,6 +23,7 @@ class Guide extends Model
     protected function casts(): array
     {
         return [
+            'specializations' => 'array',
             'availability' => 'array',
             'specializations' => 'array',
             'verified_at'  => 'datetime',

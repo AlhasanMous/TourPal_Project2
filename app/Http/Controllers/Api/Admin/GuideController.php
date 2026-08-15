@@ -112,11 +112,12 @@ class GuideController extends Controller
 
         DB::transaction(function () use ($request, $guide) {
             if ($request->action === 'verify') {
-                $guide->update([
-                    'verification_status' => 'approved',
-                    'verified_at'         => now(),
-                    'rejection_reason'    => null,
-                ]);
+
+              $guide->update([
+            'verification_status' => 'approved',
+            'verified_at'         => now(),
+            'rejection_reason'    => null,
+            ]);
 
                 // إشعار للمرشد
                 Notification::create([
@@ -158,7 +159,8 @@ class GuideController extends Controller
     }
 
     // GET /api/admin/guides/pending
-    public function pending(): JsonResponse
+    
+         public function pending(): JsonResponse
     {
         $guides = Guide::with(['user', 'city'])
             ->where('verification_status', 'pending')

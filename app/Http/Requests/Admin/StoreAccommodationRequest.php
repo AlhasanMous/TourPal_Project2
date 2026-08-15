@@ -6,11 +6,10 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreAccommodationRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return $this->user()->hasRole('admin');
-    }
-
+ public function authorize(): bool
+{
+    return $this->user()->hasRole('admin', 'api');
+}
     public function rules(): array
     {
         return [

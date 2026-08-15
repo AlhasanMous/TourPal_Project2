@@ -7,11 +7,10 @@ use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return $this->user()->hasRole('admin');
-    }
-
+public function authorize(): bool
+{
+    return $this->user()->hasRole('admin', 'api');
+}
     public function rules(): array
     {
         $userId = $this->route('user')?->id;

@@ -33,7 +33,7 @@ class GuideProfileService
 
             // إشعار للـ Admin — طلب جديد بانتظار المراجعة
             // نجيب أول admin موجود في النظام
-            $admin = User::role('admin')->first();
+           $admin = User::role('admin', 'api')->first();
             if ($admin) {
                 Notification::create([
                     'user_id' => $admin->id,
