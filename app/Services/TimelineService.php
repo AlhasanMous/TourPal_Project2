@@ -56,11 +56,16 @@ public function addItem(Workspace $workspace, array $data,?int $addedBy = null):
     // ─────────────────────────────────────────
     // تعديل item
     // ─────────────────────────────────────────
-    public function updateItem(WorkspaceTimelineItem $item, array $data): WorkspaceTimelineItem
-    {
-        $item->update(array_filter($data, fn($v) => !is_null($v)));
-        return $item->fresh();
+ public function updateItem(WorkspaceTimelineItem $item, array $data): WorkspaceTimelineItem
+{
+    // إذا بعثوا reference_id جديد — تحقق منه
+    if (isset($data['reference_id']) && $item->item_type !== 'note') {
+        $this->validateReference($item->item_type, $data['reference_id']);
     }
+
+    $item->update($data);
+    return $item->fresh();
+}
 
     // ─────────────────────────────────────────
     // حذف item

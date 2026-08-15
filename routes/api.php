@@ -16,7 +16,10 @@ use App\Http\Controllers\Api\GuideController;
 use App\Http\Controllers\Api\Admin\GuideController as AdminGuideController;
 use App\Http\Controllers\Api\GuideProfileController;
 use App\Http\Controllers\Api\Admin\AccommodationController as AdminAccommodationController;
-
+use App\Http\Controllers\Api\AccommodationController;
+use App\Http\Controllers\Api\Host\HostAccommodationController;
+use App\Http\Controllers\Api\Admin\TransportCompanyController;
+use App\Http\Controllers\Api\Admin\TransportRouteController;
 // ─────────────────────────────────────────────────────────
 // Public — Auth
 // ─────────────────────────────────────────────────────────
@@ -36,10 +39,14 @@ Route::get('places/{place}', [PlaceController::class, 'show']);
 Route::get('guides',        [GuideController::class, 'index']);
 Route::get('guides/{guide}', [GuideController::class, 'show']);
 
+// ─── Public - Accommodations ──────────────────────────────────────────────
+Route::get('accommodations',                [AccommodationController::class, 'index']);
+Route::get('accommodations/{accommodation}',[AccommodationController::class, 'show']);
 // ─────────────────────────────────────────────────────────
 // Protected — auth:sanctum
 // ─────────────────────────────────────────────────────────
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum')->group(function () 
+{
 
     // Auth
     Route::post('auth/logout', [AuthController::class, 'logout']);
@@ -91,8 +98,18 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     });
+    
 });
 
+// ─── Host ─────────────────────────────────────────────────
+Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('host')->group(function () {
+        Route::get('accommodations',                    [HostAccommodationController::class, 'index']);
+        Route::post('accommodations',                   [HostAccommodationController::class, 'store']);
+        Route::put('accommodations/{accommodation}',    [HostAccommodationController::class, 'update']);
+        Route::delete('accommodations/{accommodation}', [HostAccommodationController::class, 'destroy']);
+    });
+});
 // ─────────────────────────────────────────────────────────
 // Admin only — auth:sanctum + role:admin
 // ─────────────────────────────────────────────────────────
@@ -126,7 +143,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('guides',                 [AdminGuideController::class, 'store']);
         Route::get('guides/{guide}',          [AdminGuideController::class, 'show']);
         Route::post('guides/{guide}/verify',  [AdminGuideController::class, 'verify']);
+// Transport
+Route::prefix('transport')->group(function () {
+    // Companies
+    Route::get('companies',              [TransportCompanyController::class, 'index']);
+    Route::post('companies',             [TransportCompanyController::class, 'store']);
+    Route::put('companies/{company}',    [TransportCompanyController::class, 'update']);
+    Route::delete('companies/{company}', [TransportCompanyController::class, 'destroy']);
 
+    // Routes
+    Route::get('routes',             [TransportRouteController::class, 'index']);
+    Route::post('routes',            [TransportRouteController::class, 'store']);
+    Route::put('routes/{route}',     [TransportRouteController::class, 'update']);
+    Route::delete('routes/{route}',  [TransportRouteController::class, 'destroy']);
+});
     // Admin Accommodations
         Route::get('accommodations/pending',                      [AdminAccommodationController::class, 'pending']);
         Route::get('accommodations',                              [AdminAccommodationController::class, 'index']);

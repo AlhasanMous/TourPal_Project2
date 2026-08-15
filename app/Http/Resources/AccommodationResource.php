@@ -18,7 +18,9 @@ class AccommodationResource extends JsonResource
             'id'                  => $this->id,
             'name'                => $this->name,
             'type'                => $this->type,
-            'main_image'          => $this->images->where('is_main', true)->first()?->image_url,
+            'main_image' => $this->whenLoaded('images', fn() =>
+             $this->images->where('is_main', true)->first()?->image_url
+            ),
             'capacity'            => $this->capacity,
             'price_range'         => $this->price_range,
             'verification_status' => $this->verification_status,
