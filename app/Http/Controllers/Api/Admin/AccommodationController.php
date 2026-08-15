@@ -56,16 +56,21 @@ class AccommodationController extends Controller
         ]);
     }
 
-    public function store(StoreAccommodationRequest $request): JsonResponse
-    {
-        $accommodation = $this->accommodationService->create($request->validated());
-        $accommodation->load(['host', 'city']);
+  public function store(StoreAccommodationRequest $request): JsonResponse
+{
+    $data = $request->validated();
 
-        return response()->json([
-            'message'       => 'تم إنشاء الإقامة بنجاح',
-            'accommodation' => new AdminAccommodationResource($accommodation),
-        ], 201);
+    if ($request->hasFile('image')) {
+        $data['image'] = $request->file('image');
     }
+
+    $accommodation = $this->accommodationService->create($data);
+
+    return response()->json([
+        'message'       => 'تم إنشاء الإقامة بنجاح',
+        'accommodation' => new AdminAccommodationResource($accommodation),
+    ], 201);
+}
 
     public function verify(VerifyAccommodationRequest $request, Accommodation $accommodation): JsonResponse
     {

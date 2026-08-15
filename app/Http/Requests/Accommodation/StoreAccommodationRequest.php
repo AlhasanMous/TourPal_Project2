@@ -19,6 +19,7 @@ class StoreAccommodationRequest extends FormRequest
             : $this->route('accommodation');
 
         return [
+            'host_user_id' => ['required', 'integer', 'exists:users,id'],
             'name'        => [
                 'required',
                 'string',
@@ -51,6 +52,8 @@ class StoreAccommodationRequest extends FormRequest
             'name.required'     => 'اسم مكان الإقامة مطلوب',
             'name.unique'       => 'هذا الاسم مستخدم مسبقاً',
             'type.required'     => 'نوع مكان الإقامة مطلوب',
+            'host_user_id.required' => 'المضيف مطلوب',
+            'host_user_id.exists'   => 'المستخدم غير موجود',
             'type.in'           => 'النوع يجب أن يكون: hotel, hostel, shared',
             'city_id.required'  => 'المدينة مطلوبة',
             'city_id.exists'    => 'المدينة غير موجودة',

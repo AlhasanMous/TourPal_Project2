@@ -7,7 +7,9 @@ use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 class AdminAccommodationService
 {
     public function getAll(array $filters = []): LengthAwarePaginator
@@ -108,4 +110,45 @@ class AdminAccommodationService
 
         return $accommodation->fresh(['host', 'city']);
     }
+ // ── Image Helpers ──────────────────────────────────────────────
+
+    private function createMainImage(Accommodation $accommodation, string $url): void
+    {
+        $accommodation->images()->create([
+            'image_url'  => $url,
+            'is_main'    => true,
+            'sort_order' => 1,
+        ]);
+    }
+
+    private function storeWebImage(string $url): ?string
+    {
+        try {
+            $response = Http::withOptions(['verify' => false])
+                            ->timeout(30)
+                            ->get($url);
+
+            if (!$response->successful()) return null;
+
+            $ext      = $this->guessExtension($response);
+            $filename = 'accommodations/' . Str::random(40) . '.' . $ext;
+            Storage::disk('public')->put($filename, $response->body());
+
+            return '/storage/' . $filename;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    private function guessExtension($response): string
+    {
+        $ct = $response->header('Content-Type') ?? '';
+        return match (true) {
+            str_contains($ct, 'image/webp') => 'webp',
+            str_contains($ct, 'image/png')  => 'png',
+            str_contains($ct, 'image/gif')  => 'gif',
+            default                          => 'jpg',
+        };
+    }
 }
+    
