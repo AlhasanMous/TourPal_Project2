@@ -65,17 +65,17 @@ class AdminAccommodationService
 
     public function verify(Accommodation $accommodation, string $action, ?string $reason): Accommodation
     {
-        if ($accommodation->verification_status === 'verified' && $action === 'verify') {
+      if ($accommodation->verification_status === 'approved' && $action === 'verify') {
             throw new \Exception('هذه الإقامة محققة مسبقاً');
         }
 
         DB::transaction(function () use ($accommodation, $action, $reason) {
-            if ($action === 'verify') {
-                $accommodation->update([
-                    'verification_status' => 'verified',
-                    'verified_at'         => now(),
-                    'rejection_reason'    => null,
-                ]);
+           if ($action === 'verify') {
+            $accommodation->update([
+                'verification_status' => 'approved',
+                'verified_at'         => now(),
+                'rejection_reason'    => null,
+                 ]);
 
                 Notification::create([
                     'user_id' => $accommodation->host_user_id,
