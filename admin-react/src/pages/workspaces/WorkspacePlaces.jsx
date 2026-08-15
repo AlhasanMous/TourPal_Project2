@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { HiOutlineLocationMarker } from 'react-icons/hi';
 
 import workspaceService from '../../services/workspaceService';
 
@@ -122,7 +123,12 @@ export default function WorkspacePlaces() {
 
 
             <PageHeader
-                title="Workspace Places"
+                title={(
+                    <>
+                        <HiOutlineLocationMarker className="inline-block mr-3 text-3xl text-rose-600 align-middle" />
+                        Workspace Places
+                    </>
+                )}
                 subtitle="Explore places included in this workspace."
             />
 
@@ -131,7 +137,7 @@ export default function WorkspacePlaces() {
 
 
 
-            <div className="rounded-xl bg-white p-6 shadow-sm">
+            <div className="rounded-xl bg-white p-6 shadow-md border border-gray-100">
 
 
                 <div className="flex flex-col gap-6 md:flex-row">
@@ -142,19 +148,17 @@ export default function WorkspacePlaces() {
 
                     <div className="md:w-1/2">
 
-                        <img
-                            src={
-                                place.images?.[0]?.url ??
-                                '/images/no-image.png'
-                            }
-                            alt={place.name}
-                            className="
-                                h-72
-                                w-full
-                                rounded-xl
-                                object-cover
-                            "
-                        />
+                        <div className="relative">
+                            <img
+                                src={place.images?.[0]?.url ?? '/images/no-image.png'}
+                                alt={place.name}
+                                className="h-72 w-full rounded-xl object-cover"
+                            />
+
+                            <div className="absolute left-4 top-4 rounded-full bg-white/80 px-3 py-1 text-sm font-medium text-gray-800">
+                                {place.city ?? ''}
+                            </div>
+                        </div>
 
                     </div>
 

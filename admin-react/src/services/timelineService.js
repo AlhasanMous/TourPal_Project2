@@ -1,8 +1,9 @@
 import api from './api';
 
 const getTimeline = async (workspaceId) => {
+    // admin UI should use admin endpoint to get timeline shape matching admin controllers
     const response = await api.get(
-        `/workspaces/${workspaceId}/timeline`
+        `/admin/workspaces/${workspaceId}/timeline`
     );
 
     return response.data;

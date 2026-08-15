@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { HiOutlineCollection, HiOutlineSearch, HiOutlineUserGroup, HiOutlineEye } from 'react-icons/hi';
 import workspaceService from '../../services/workspaceService';
 import PageHeader from '../../components/layout/PageHeader';
 import DataTable from '../../components/tables/DataTable';
@@ -170,7 +171,12 @@ export default function WorkspacesList() {
     return (
         <div>
             <PageHeader
-                title="Workspaces"
+                title={(
+                    <>
+                        <HiOutlineCollection className="inline-block mr-3 text-3xl text-blue-600 align-middle" />
+                        Workspaces
+                    </>
+                )}
                 subtitle="Manage shared trip workspaces."
             />
 
@@ -181,13 +187,17 @@ export default function WorkspacesList() {
                     className="flex flex-col gap-4 md:flex-row md:items-end"
                 >
                     <div className="flex-1">
-                        <Input
-                            label="Search"
-                            type="text"
-                            placeholder="Search workspaces..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
+                        <div className="relative">
+                            <Input
+                                label="Search"
+                                type="text"
+                                placeholder="Search workspaces..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
+
+                            <HiOutlineSearch className="absolute right-3 top-10 text-gray-400" />
+                        </div>
                     </div>
 
                     <div className="md:w-48">
@@ -207,7 +217,7 @@ export default function WorkspacesList() {
                     </div>
 
                     <Button type="submit">
-                        Search
+                        <span className="flex items-center gap-2"><HiOutlineSearch /> Search</span>
                     </Button>
                 </form>
             </div>
@@ -226,23 +236,19 @@ export default function WorkspacesList() {
                             <div className="flex items-center justify-end gap-2">
 
                                 {/* View */}
-                                <Link
-                                    to={`/workspaces/${workspace.id}`}
-                                >
+                                <Link to={`/workspaces/${workspace.id}`}>
                                     <Button variant="secondary">
-                                        View Details
+                                        <span className="flex items-center gap-2"><HiOutlineEye /> Details</span>
                                     </Button>
                                 </Link>
 
 
   {/* TimeLine */}
-  <Link
-      to={`/workspaces/${workspace.id}/timeline`}
-  >
-      <Button variant="secondary">
-        View Timeline
-      </Button>
-  </Link>
+    <Link to={`/workspaces/${workspace.id}/timeline`}>
+            <Button variant="secondary">
+                Timeline
+            </Button>
+    </Link>
 
 
 

@@ -14,12 +14,16 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        $admin = User::create([
-            'name'          => 'TourPal Admin',
-            'email'         => 'admin@tourpal.sy',
-            'password_hash' => Hash::make('Admin@123456'),
-        ]);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@tourpal.sy'],
+            [
+                'name' => 'TourPal Admin',
+                'password_hash' => Hash::make('Admin@123456'),
+            ]
+        );
 
-        $admin->assignRole('admin');
+        if (!$admin->hasRole('admin')) {
+            $admin->assignRole('admin');
+        }
     }
 }

@@ -25,14 +25,57 @@ export default function WorkspaceTimeline() {
                 setLoading(true);
                 setError('');
 
-                const [workspaceData, timelineData] =
+                // fetch workspace (admin) and timeline (public) and places for mapping
+                const [workspaceData, timelineData, placesData] =
                     await Promise.all([
                         workspaceService.getWorkspace(id),
                         timelineService.getTimeline(id),
+                        workspaceService.getWorkspacePlaces(id),
                     ]);
 
-                setWorkspace(workspaceData.workspace);
-                setTimeline(timelineData.timeline ?? []);
+                const ws = workspaceData.workspace;
+                setWorkspace(ws);
+
+                // build a map of places by id (placesData items wrap the place object)
+                const places = (placesData.places || []).reduce((acc, pwp) => {
+                    const p = pwp.place ?? pwp;
+                    if (p && p.id) acc[p.id] = p;
+                    return acc;
+                }, {});
+
+                // timeline endpoint may return grouped days [{date, items: [...]}, ...]
+                let rawItems = [];
+                if (Array.isArray(timelineData.timeline) && timelineData.timeline.length > 0 && timelineData.timeline[0].items) {
+                    // flatten grouped days
+                    rawItems = timelineData.timeline.flatMap((day) => day.items || []);
+                } else {
+                    rawItems = timelineData.timeline || [];
+                }
+
+                // attach place objects when reference_id exists
+                const items = (rawItems).map((it) => {
+                    const copy = { ...it };
+                    if (it.item_type === 'place' && it.reference_id) {
+                        copy.place = places[it.reference_id] || null;
+                    }
+
+                    // normalize planned_date: remove time suffix if present
+                    if (copy.planned_date) {
+                        // keep only date part if ISO string
+                        if (typeof copy.planned_date === 'string' && copy.planned_date.includes('T')) {
+                            copy.planned_date = copy.planned_date.split('T')[0];
+                        }
+                    }
+
+                    // normalize planned_time (HH:MM[:ss])
+                    if (copy.planned_time && copy.planned_time.length >= 5) {
+                        copy.planned_time = copy.planned_time.substring(0, 5);
+                    }
+
+                    return copy;
+                });
+
+                setTimeline(items);
             } catch (err) {
                 console.error('Timeline error:', err);
 
@@ -108,15 +151,20 @@ export default function WorkspaceTimeline() {
             return 'No Date';
         }
 
-        return new Date(`${date}T00:00:00`).toLocaleDateString(
-            'en-US',
-            {
+        try {
+            // accept either 'YYYY-MM-DD' or full ISO string; normalize to date part
+            const datePart = (typeof date === 'string' && date.includes('T')) ? date.split('T')[0] : date;
+            const dt = new Date(`${datePart}T00:00:00`);
+
+            return dt.toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
-            }
-        );
+            });
+        } catch (e) {
+            return date;
+        }
     };
 
     const formatTime = (time) => {
@@ -172,7 +220,7 @@ export default function WorkspaceTimeline() {
             item.place?.name_en ??
             item.place?.name_ar ??
             item.title ??
-            'Timeline Activity'
+            (item.item_type === 'place' && item.reference_id ? `Place #${item.reference_id}` : 'Timeline Activity')
         );
     };
 
@@ -296,36 +344,36 @@ export default function WorkspaceTimeline() {
 
                                                                         <div className="flex flex-wrap items-start justify-between gap-3">
 
-                                                                            <div>
-                                                                                <div className="flex flex-wrap items-center gap-2">
+                                                                            <div className="flex items-start gap-3">
+                                                                                {item.place?.main_image && (
+                                                                                    <img
+                                                                                        src={item.place.main_image}
+                                                                                        alt={item.place.name_en || 'place'}
+                                                                                        className="h-16 w-24 rounded object-cover"
+                                                                                    />
+                                                                                )}
 
-                                                                                    <span className="text-lg font-semibold text-gray-800">
-                                                                                        {
-                                                                                            getItemTitle(
-                                                                                                item
-                                                                                            )
-                                                                                        }
-                                                                                    </span>
+                                                                                <div>
+                                                                                    <div className="flex flex-wrap items-center gap-2">
 
-                                                                                    <span
-                                                                                        className={`rounded-full px-2.5 py-1 text-xs font-medium ${getTypeBadgeClass(
-                                                                                            item.item_type
-                                                                                        )}`}
-                                                                                    >
-                                                                                        {
-                                                                                            getTypeLabel(
+                                                                                        <span className="text-lg font-semibold text-gray-800">
+                                                                                            {getItemTitle(item)}
+                                                                                        </span>
+
+                                                                                        <span
+                                                                                            className={`rounded-full px-2.5 py-1 text-xs font-medium ${getTypeBadgeClass(
                                                                                                 item.item_type
-                                                                                            )
-                                                                                        }
-                                                                                    </span>
+                                                                                            )}`}
+                                                                                        >
+                                                                                            {getTypeLabel(item.item_type)}
+                                                                                        </span>
 
+                                                                                    </div>
+
+                                                                                    <p className="mt-2 text-sm font-medium text-gray-600">
+                                                                                        {formatTime(item.planned_time)}
+                                                                                    </p>
                                                                                 </div>
-
-                                                                                <p className="mt-2 text-sm font-medium text-gray-600">
-                                                                                    {formatTime(
-                                                                                        item.planned_time
-                                                                                    )}
-                                                                                </p>
                                                                             </div>
 
                                                                             <div className="flex gap-2">

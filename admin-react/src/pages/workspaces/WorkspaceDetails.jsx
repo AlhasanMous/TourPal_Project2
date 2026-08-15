@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { HiOutlineCalendar, HiOutlineUser, HiOutlineUsers, HiOutlineIdentification } from 'react-icons/hi';
 import workspaceService from '../../services/workspaceService';
 import PageHeader from '../../components/layout/PageHeader';
 import Button from '../../components/common/Button';
@@ -72,7 +73,12 @@ export default function WorkspaceDetails() {
     return (
         <div>
             <PageHeader
-                title={workspace.name}
+                title={(
+                    <>
+                        <HiOutlineIdentification className="inline-block mr-3 text-3xl text-indigo-600 align-middle" />
+                        {workspace.name}
+                    </>
+                )}
                 subtitle="Workspace details"
             />
 
@@ -87,8 +93,9 @@ export default function WorkspaceDetails() {
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
                 {/* Basic Information */}
-                <div className="rounded-lg bg-white p-6 shadow-sm">
-                    <h2 className="mb-4 text-xl font-semibold text-gray-800">
+                <div className="rounded-lg bg-gradient-to-r from-white to-gray-50 p-6 shadow-md border border-gray-100">
+                    <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold text-gray-800">
+                        <HiOutlineCalendar className="text-blue-500" />
                         Workspace Information
                     </h2>
 
@@ -112,20 +119,16 @@ export default function WorkspaceDetails() {
                         </div>
 
                         <div>
-                            <p className="text-sm text-gray-500">
-                                Visibility
-                            </p>
+                            <p className="text-sm text-gray-500">Visibility</p>
 
-                            <span
-                                className={`inline-block rounded-full px-3 py-1 text-sm font-medium ${
-                                    workspace.is_public
-                                        ? 'bg-green-100 text-green-700'
-                                        : 'bg-gray-100 text-gray-700'
-                                }`}
-                            >
-                                {workspace.is_public
-                                    ? 'Public'
-                                    : 'Private'}
+                            <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ${workspace.is_public ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                                {workspace.is_public ? (
+                                    <span className="h-2 w-2 rounded-full bg-green-500 block" />
+                                ) : (
+                                    <span className="h-2 w-2 rounded-full bg-gray-400 block" />
+                                )}
+
+                                {workspace.is_public ? 'Public' : 'Private'}
                             </span>
                         </div>
 
@@ -159,51 +162,38 @@ export default function WorkspaceDetails() {
 
                 {/* Owner */}
                 <div className="rounded-lg bg-white p-6 shadow-sm">
-                    <h2 className="mb-4 text-xl font-semibold text-gray-800">
-                        Owner
+                    <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold text-gray-800">
+                        <HiOutlineUser className="text-indigo-500" /> Owner
                     </h2>
 
                     {workspace.owner ? (
                         <div className="space-y-4">
-                            <div>
-                                <p className="text-sm text-gray-500">
-                                    Name
-                                </p>
-                                <p className="font-medium text-gray-900">
-                                    {workspace.owner.name}
-                                </p>
+                            <div className="flex items-center gap-4">
+                                {workspace.owner.photo ? (
+                                    <img src={workspace.owner.photo} alt={workspace.owner.name} className="h-14 w-14 rounded-full object-cover" />
+                                ) : (
+                                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 text-gray-500">{workspace.owner.name?.charAt(0)}</div>
+                                )}
+
+                                <div>
+                                    <p className="text-sm text-gray-500">Name</p>
+                                    <p className="font-medium text-gray-900">{workspace.owner.name}</p>
+                                    <p className="text-xs text-gray-500">{workspace.owner.email}</p>
+                                </div>
                             </div>
 
                             <div>
-                                <p className="text-sm text-gray-500">
-                                    Email
-                                </p>
-                                <p className="text-gray-900">
-                                    {workspace.owner.email}
-                                </p>
-                            </div>
-
-                            <div>
-                                <p className="text-sm text-gray-500">
-                                    Roles
-                                </p>
+                                <p className="text-sm text-gray-500">Roles</p>
 
                                 <div className="mt-1 flex flex-wrap gap-2">
                                     {workspace.owner.roles?.map((role) => (
-                                        <span
-                                            key={role}
-                                            className="rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-700"
-                                        >
-                                            {role}
-                                        </span>
+                                        <span key={role} className="rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-700">{role}</span>
                                     ))}
                                 </div>
                             </div>
                         </div>
                     ) : (
-                        <p className="text-gray-500">
-                            No owner information.
-                        </p>
+                        <p className="text-gray-500">No owner information.</p>
                     )}
                 </div>
 

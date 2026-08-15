@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { HiOutlineSparkles } from 'react-icons/hi';
 
 import workspaceService from '../../services/workspaceService';
 
@@ -71,7 +72,12 @@ export default function WorkspaceSuggestions() {
         <div>
 
             <PageHeader
-                title="Workspace Suggestions"
+                title={(
+                    <>
+                        <HiOutlineSparkles className="inline-block mr-3 text-3xl text-yellow-500 align-middle" />
+                        Workspace Suggestions
+                    </>
+                )}
                 subtitle="View suggestions for this workspace."
             />
 
@@ -79,58 +85,28 @@ export default function WorkspaceSuggestions() {
             <ErrorMessage message={error} />
 
 
-            <div className="rounded-lg bg-white p-6 shadow-sm">
-
-
+            <div className="rounded-lg bg-white p-6 shadow-md border border-gray-100">
                 {suggestions.length === 0 ? (
-
-                    <p className="text-gray-500">
-                        No suggestions found.
-                    </p>
-
+                    <p className="text-gray-500">No suggestions found.</p>
                 ) : (
-
-
                     <div className="space-y-4">
-
-
                         {suggestions.map((suggestion) => (
+                            <div key={suggestion.id} className="rounded-lg border border-gray-100 bg-gray-50 p-4">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="font-semibold text-gray-800">{suggestion.title ?? 'Suggestion'}</h3>
+                                    <span className="inline-block rounded-full bg-white/60 px-3 py-1 text-xs text-gray-700">{suggestion.status}</span>
+                                </div>
 
-                            <div
-                                key={suggestion.id}
-                                className="rounded-lg border border-gray-200 p-4"
-                            >
+                                <p className="mt-2 text-sm text-gray-600">{suggestion.description ?? '-'}</p>
 
-                                <h3 className="font-semibold text-gray-800">
-                                    {suggestion.title ?? 'Suggestion'}
-                                </h3>
-
-
-                                <p className="mt-2 text-sm text-gray-600">
-                                    {suggestion.description ?? '-'}
-                                </p>
-
-
-                                {suggestion.status && (
-
-                                    <span className="mt-3 inline-block rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700">
-                                        {suggestion.status}
-                                    </span>
-
+                                {suggestion.payload && (
+                                    <pre className="mt-3 max-w-full overflow-auto rounded bg-white p-2 text-xs text-gray-600">{JSON.stringify(suggestion.payload)}</pre>
                                 )}
-
                             </div>
-
                         ))}
-
-
                     </div>
-
                 )}
-
-
             </div>
-
 
             <div className="mt-6">
 

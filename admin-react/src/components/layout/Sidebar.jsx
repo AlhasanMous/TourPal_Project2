@@ -5,11 +5,13 @@ import {
     Building2,
     MapPin,
     Briefcase,
+    UserCheck,
 } from 'lucide-react';
 
 const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Users', path: '/users', icon: Users },
+    { name: 'Guides', path: '/guides', icon: UserCheck },
     { name: 'Cities', path: '/cities', icon: Building2 },
     { name: 'Places', path: '/places', icon: MapPin },
     { name: 'Workspaces', path: '/workspaces', icon: Briefcase },

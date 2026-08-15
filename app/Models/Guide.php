@@ -24,6 +24,7 @@ class Guide extends Model
     {
         return [
             'availability' => 'array',
+            'specializations' => 'array',
             'verified_at'  => 'datetime',
         ];
     }
@@ -48,20 +49,20 @@ class Guide extends Model
         return $this->morphMany(Review::class, 'reviewable');
     }
     public function images(): MorphMany
-{
-    return $this->morphMany(Image::class, 'imageable')
-                ->orderBy('sort_order');
-}
+    {
+        return $this->morphMany(Image::class, 'imageable')
+            ->orderBy('sort_order');
+    }
 
-// public function mainImage(): MorphOne
-// {
-//     return $this->morphMany(Image::class, 'imageable')
-//                 ->where('is_main', true);
-// }
-// الصح ✅
-public function mainImage(): MorphOne
-{
-    return $this->morphOne(Image::class, 'imageable')
-                ->where('is_main', true);
-}
+    // public function mainImage(): MorphOne
+    // {
+    //     return $this->morphMany(Image::class, 'imageable')
+    //                 ->where('is_main', true);
+    // }
+    // الصح ✅
+    public function mainImage(): MorphOne
+    {
+        return $this->morphOne(Image::class, 'imageable')
+            ->where('is_main', true);
+    }
 }
