@@ -9,6 +9,31 @@ import Input from '../../components/common/Input';
 import Loading from '../../components/common/Loading';
 import ErrorMessage from '../../components/common/ErrorMessage';
 
+import {
+    Save,
+    X,
+    UserRound,
+    FileText,
+    Languages as LanguagesIcon,
+    Radar,
+} from 'lucide-react';
+
+// moved outside EditUser — defining it inside the component recreated its
+// identity on every render (every keystroke), which caused React to remount
+// its children and lose input focus. Purely a structural fix, no logic changed.
+function FormSection({ icon: Icon, iconClass, title, children }) {
+    return (
+        <div className="rounded-xl border border-slate-200/70 bg-white p-6 shadow-sm">
+            <p className="mb-4 flex items-center gap-2 text-base font-bold text-slate-700">
+                {Icon && <Icon className={`h-5 w-5 ${iconClass ?? ''}`} />}
+                {title}
+            </p>
+
+            {children}
+        </div>
+    );
+}
+
 export default function EditUser() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -139,119 +164,145 @@ export default function EditUser() {
 
             <ErrorMessage message={error} />
 
-            <div className="max-w-3xl rounded-lg bg-white p-6 shadow-sm">
-                <form onSubmit={handleSubmit}>
+            <div className="w-full">
+                <form onSubmit={handleSubmit} className="space-y-4">
 
-                    <div className="mb-4">
-                        <Input
-                            label="Name"
-                            name="name"
-                            type="text"
-                            value={form.name}
-                            onChange={handleChange}
-                            error={errors.name}
-                            required
-                        />
-                    </div>
+                    <FormSection
+                        icon={UserRound}
+                        iconClass="text-violet-500"
+                        title="Basic Information"
+                    >
+                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                            <div>
+                                <Input
+                                    label="Name"
+                                    name="name"
+                                    type="text"
+                                    value={form.name}
+                                    onChange={handleChange}
+                                    error={errors.name}
+                                    required
+                                />
+                            </div>
 
-                    <div className="mb-4">
-                        <Input
-                            label="Email"
-                            name="email"
-                            type="email"
-                            value={form.email}
-                            onChange={handleChange}
-                            error={errors.email}
-                            required
-                        />
-                    </div>
+                            <div>
+                                <Input
+                                    label="Email"
+                                    name="email"
+                                    type="email"
+                                    value={form.email}
+                                    onChange={handleChange}
+                                    error={errors.email}
+                                    required
+                                />
+                            </div>
+                        </div>
+                    </FormSection>
 
-                    <div className="mb-4">
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Bio
-                        </label>
+                    <FormSection
+                        icon={FileText}
+                        iconClass="text-teal-500"
+                        title="Profile"
+                    >
+                        <div className="mb-5">
+                            <label className="mb-1.5 block text-sm font-bold text-slate-600">
+                                Bio
+                            </label>
 
-                        <textarea
-                            name="bio"
-                            value={form.bio}
-                            onChange={handleChange}
-                            rows={4}
-                            className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
+                            <textarea
+                                name="bio"
+                                value={form.bio}
+                                onChange={handleChange}
+                                rows={4}
+                                className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
 
-                        {errors.bio && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.bio}
+                            {errors.bio && (
+                                <p className="mt-1 text-sm text-red-600">
+                                    {errors.bio}
+                                </p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="mb-1.5 flex items-center gap-1.5 text-sm font-bold text-slate-600">
+                                <LanguagesIcon className="h-4 w-4 text-slate-400" />
+                                Languages
+                            </label>
+
+                            <input
+                                type="text"
+                                value={form.languages.join(', ')}
+                                onChange={handleLanguagesChange}
+                                placeholder="Arabic, English, French"
+                                className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+
+                            <p className="mt-1.5 text-sm text-slate-500">
+                                Separate languages with commas.
                             </p>
-                        )}
+
+                            {errors.languages && (
+                                <p className="mt-1 text-sm text-red-600">
+                                    {errors.languages}
+                                </p>
+                            )}
+                        </div>
+                    </FormSection>
+
+                    <FormSection
+                        icon={Radar}
+                        iconClass="text-blue-500"
+                        title="Matching Settings"
+                    >
+                        <div className="flex items-center gap-2.5">
+                            <input
+                                id="is_matching_enabled"
+                                name="is_matching_enabled"
+                                type="checkbox"
+                                checked={form.is_matching_enabled}
+                                onChange={(e) =>
+                                    setForm((prev) => ({
+                                        ...prev,
+                                        is_matching_enabled:
+                                            e.target.checked,
+                                    }))
+                                }
+                                className="h-5 w-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-400"
+                            />
+
+                            <label
+                                htmlFor="is_matching_enabled"
+                                className="text-base font-semibold text-slate-700"
+                            >
+                                Enable matching
+                            </label>
+                        </div>
+                    </FormSection>
+
+                    <div className="rounded-xl border border-slate-200/70 bg-white p-6">
+                        <div className="flex gap-3">
+                            <Button
+                                type="submit"
+                                disabled={saving}
+                            >
+                                <Save className="mr-1.5 inline-block h-4 w-4" />
+                                {saving
+                                    ? 'Saving...'
+                                    : 'Save Changes'}
+                            </Button>
+
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                onClick={() => navigate('/users')}
+                            >
+                                <X className="mr-1.5 inline-block h-4 w-4" />
+                                Cancel
+                            </Button>
+                        </div>
                     </div>
 
-                    <div className="mb-4">
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Languages
-                        </label>
-
-                        <input
-                            type="text"
-                            value={form.languages.join(', ')}
-                            onChange={handleLanguagesChange}
-                            placeholder="Arabic, English, French"
-                            className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-
-                        <p className="mt-1 text-xs text-gray-500">
-                            Separate languages with commas.
-                        </p>
-
-                        {errors.languages && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.languages}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="mb-6 flex items-center gap-2">
-                        <input
-                            id="is_matching_enabled"
-                            name="is_matching_enabled"
-                            type="checkbox"
-                            checked={form.is_matching_enabled}
-                            onChange={(e) =>
-                                setForm((prev) => ({
-                                    ...prev,
-                                    is_matching_enabled:
-                                        e.target.checked,
-                                }))
-                            }
-                            className="h-4 w-4"
-                        />
-
-                        <label
-                            htmlFor="is_matching_enabled"
-                            className="text-sm font-medium text-gray-700"
-                        >
-                            Enable matching
-                        </label>
-                    </div>
-
-                    <div className="flex gap-3">
-                        <Button
-                            type="submit"
-                            disabled={saving}
-                        >
-                            {saving
-                                ? 'Saving...'
-                                : 'Save Changes'}
-                        </Button>
-
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            onClick={() => navigate('/users')}
-                        >
-                            Cancel
-                        </Button>
-                    </div>
                 </form>
             </div>
         </div>

@@ -18,7 +18,7 @@ class GuideFactory extends Factory
         return [
             'user_id' => User::factory(),
             'city_id' => $city?->id ?? null,
-            'verification_status' => $this->faker->randomElement(['pending', 'verified', 'rejected']),
+            'verification_status' => $this->faker->randomElement(['pending', 'approved', 'rejected']),
             'specializations' => $this->faker->randomElements(['history', 'food', 'nature', 'architecture', 'religious'], 2),
             'availability' => [
                 'monday' => ['08:00', '16:00'],

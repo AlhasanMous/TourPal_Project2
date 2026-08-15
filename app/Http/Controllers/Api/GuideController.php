@@ -17,11 +17,15 @@ class GuideController extends Controller
     public function index(Request $request): JsonResponse
     {
         $guides = Guide::with(['user', 'city', 'images'])
-            ->where('verification_status', 'verified')
-            ->when($request->city_id, fn($q) =>
+            ->where('verification_status', 'approved')
+            ->when(
+                $request->city_id,
+                fn($q) =>
                 $q->where('city_id', $request->city_id)
             )
-            ->when($request->specialization, fn($q) =>
+            ->when(
+                $request->specialization,
+                fn($q) =>
                 $q->where('specializations', 'like', '%' . $request->specialization . '%')
             )
             ->paginate(15);
@@ -44,7 +48,7 @@ class GuideController extends Controller
     public function show(Guide $guide): JsonResponse
     {
         // بس المرشدين المعتمدين يظهروا للعامة
-        if ($guide->verification_status !== 'verified') {
+        if ($guide->verification_status !== 'approved') {
             return response()->json([
                 'message' => 'هذا المرشد غير متاح',
             ], 404);

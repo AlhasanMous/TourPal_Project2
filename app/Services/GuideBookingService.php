@@ -19,7 +19,7 @@ class GuideBookingService
         $guide = Guide::findOrFail($data['guide_id']);
 
         // تحقق إن المرشد معتمد
-        if ($guide->verification_status !== 'verified') {
+        if ($guide->verification_status !== 'approved') {
             throw ValidationException::withMessages([
                 'guide_id' => ['هذا المرشد غير معتمد من الإدارة'],
             ]);

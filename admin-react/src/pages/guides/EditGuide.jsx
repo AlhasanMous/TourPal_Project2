@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import guideService from '../../services/guideService';
+import cityService from '../../services/cityService';
 
 import PageHeader from '../../components/layout/PageHeader';
 import Input from '../../components/common/Input';
@@ -15,6 +16,8 @@ export default function EditGuide() {
     const [guide, setGuide] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [cities, setCities] = useState([]);
+    const [cityId, setCityId] = useState('');
 
     const [specializations, setSpecializations] = useState('');
     const [availability, setAvailability] = useState('');
@@ -23,11 +26,17 @@ export default function EditGuide() {
         const fetch = async () => {
             setLoading(true);
             try {
-                const data = await guideService.getGuide(id);
-                const g = data.guide ?? data;
+                const [guideData, cityList] = await Promise.all([
+                    guideService.getGuide(id),
+                    cityService.getAll(),
+                ]);
+
+                const g = guideData.guide ?? guideData;
                 setGuide(g);
+                setCities(Array.isArray(cityList) ? cityList : []);
+                setCityId(g.city_id ?? g.city?.id ?? '');
                 setSpecializations(Array.isArray(g.specializations) ? g.specializations.join(', ') : (g.specializations || ''));
-                setAvailability(Array.isArray(g.availability) ? JSON.stringify(g.availability) : (g.availability || ''));
+                setAvailability(Array.isArray(g.availability) ? JSON.stringify(g.availability, null, 2) : (g.availability ? JSON.stringify(g.availability, null, 2) : JSON.stringify([], null, 2)));
             } catch (err) {
                 setError(err.response?.data?.message ?? 'Failed to load guide.');
             } finally {
@@ -67,7 +76,18 @@ export default function EditGuide() {
 
                 <div className="mb-4">
                     <label className="mb-1 block text-sm font-medium text-gray-700">City</label>
-                    <Input value={guide?.city?.name ?? ''} disabled />
+                    <select
+                        value={cityId}
+                        onChange={(e) => setCityId(e.target.value)}
+                        className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        <option value="">Select city</option>
+                        {cities.map((city) => (
+                            <option key={city.id} value={city.id}>
+                                {city.name_en || city.name_ar || 'City'}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 <div className="mb-4">

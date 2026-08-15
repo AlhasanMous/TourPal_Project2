@@ -17,7 +17,6 @@ import CreatePlace from '../pages/places/CreatePlace';
 import EditPlace from '../pages/places/EditPlace';
 import GuidesList from '../pages/guides/GuidesList';
 import GuideDetails from '../pages/guides/GuideDetails';
-import EditGuide from '../pages/guides/EditGuide';
 import WorkspacesList from '../pages/workspaces/WorkspacesList';
 import WorkspaceDetails from '../pages/workspaces/WorkspaceDetails';
 import WorkspaceTimeline from '../pages/workspaces/WorkspaceTimeline';
@@ -77,7 +76,6 @@ export default function AppRoutes() {
 
                 <Route path="/guides" element={<GuidesList />} />
                 <Route path="/guides/:id" element={<GuideDetails />} />
-                <Route path="/guides/:id/edit" element={<EditGuide />} />
 
 </Route>
 

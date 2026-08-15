@@ -1,5 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import {
+    HiCalendarDays,
+    HiMap,
+    HiUsers,
+    HiClock,
+    HiSquares2X2,
+    HiMapPin,
+    HiBriefcase,
+    HiDocumentText,
+    HiArrowLeft,
+} from 'react-icons/hi2';
 
 import timelineService from '../../services/timelineService';
 import workspaceService from '../../services/workspaceService';
@@ -231,7 +242,12 @@ export default function WorkspaceTimeline() {
     return (
         <div>
             <PageHeader
-                title="Workspace Timeline"
+                title={(
+                    <>
+                        <HiCalendarDays className="mr-2 inline-block align-middle text-2xl text-indigo-600" />
+                        Workspace Timeline
+                    </>
+                )}
                 subtitle={
                     workspace?.name
                         ? `Timeline for ${workspace.name}`
@@ -266,7 +282,10 @@ export default function WorkspaceTimeline() {
                             variant="secondary"
                             onClick={() => navigate('/workspaces')}
                         >
-                            ← Back to Workspaces
+                            <span className="flex items-center gap-2">
+                                <HiArrowLeft className="text-base" />
+                                Back to Workspaces
+                            </span>
                         </Button>
 
 
@@ -318,9 +337,10 @@ export default function WorkspaceTimeline() {
 
                                                     {/* Date */}
                                                     <div className="mb-5 flex items-center gap-3">
-                                                        <div className="h-3 w-3 rounded-full bg-blue-600" />
+                                                        <div className="h-3 w-3 rounded-full bg-indigo-600 shadow-sm shadow-indigo-200" />
 
-                                                        <h3 className="text-lg font-semibold text-gray-800">
+                                                        <h3 className="flex items-center gap-2 text-lg font-semibold tracking-tight text-slate-800">
+                                                            <HiCalendarDays className="text-lg text-indigo-600" />
                                                             {formatDate(date)}
                                                         </h3>
                                                     </div>
@@ -464,62 +484,69 @@ export default function WorkspaceTimeline() {
                             {/* Timeline Overview */}
                             <div className="rounded-lg bg-white p-6 shadow-sm">
 
-                                <h2 className="mb-5 text-lg font-semibold text-gray-800">
+                                <h2 className="mb-5 flex items-center gap-2 text-xl font-semibold tracking-tight text-slate-800">
+                                    <HiSquares2X2 className="text-lg text-indigo-600" />
                                     Timeline Overview
                                 </h2>
 
                                 <div className="grid grid-cols-2 gap-4">
 
-                                    <div className="rounded-lg bg-gray-50 p-4">
-                                        <p className="text-xs text-gray-500">
+                                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+                                        <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                            <HiClock className="text-indigo-600" />
                                             Total Items
                                         </p>
-                                        <p className="mt-1 text-2xl font-bold text-gray-800">
+                                        <p className="mt-2 text-3xl font-extrabold text-slate-800">
                                             {overview.total}
                                         </p>
                                     </div>
 
-                                    <div className="rounded-lg bg-gray-50 p-4">
-                                        <p className="text-xs text-gray-500">
+                                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+                                        <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                            <HiMap className="text-indigo-600" />
                                             Places
                                         </p>
-                                        <p className="mt-1 text-2xl font-bold text-gray-800">
+                                        <p className="mt-2 text-3xl font-extrabold text-slate-800">
                                             {overview.places}
                                         </p>
                                     </div>
 
-                                    <div className="rounded-lg bg-gray-50 p-4">
-                                        <p className="text-xs text-gray-500">
+                                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+                                        <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                            <HiBriefcase className="text-violet-600" />
                                             Accommodation
                                         </p>
-                                        <p className="mt-1 text-2xl font-bold text-gray-800">
+                                        <p className="mt-2 text-3xl font-extrabold text-slate-800">
                                             {overview.accommodations}
                                         </p>
                                     </div>
 
-                                    <div className="rounded-lg bg-gray-50 p-4">
-                                        <p className="text-xs text-gray-500">
+                                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+                                        <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                            <HiMapPin className="text-amber-600" />
                                             Transport
                                         </p>
-                                        <p className="mt-1 text-2xl font-bold text-gray-800">
+                                        <p className="mt-2 text-3xl font-extrabold text-slate-800">
                                             {overview.transport}
                                         </p>
                                     </div>
 
-                                    <div className="rounded-lg bg-gray-50 p-4">
-                                        <p className="text-xs text-gray-500">
+                                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+                                        <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                            <HiDocumentText className="text-slate-600" />
                                             Notes
                                         </p>
-                                        <p className="mt-1 text-2xl font-bold text-gray-800">
+                                        <p className="mt-2 text-3xl font-extrabold text-slate-800">
                                             {overview.notes}
                                         </p>
                                     </div>
 
-                                    <div className="rounded-lg bg-gray-50 p-4">
-                                        <p className="text-xs text-gray-500">
+                                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+                                        <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                            <HiUsers className="text-emerald-600" />
                                             Participants
                                         </p>
-                                        <p className="mt-1 text-2xl font-bold text-gray-800">
+                                        <p className="mt-2 text-3xl font-extrabold text-slate-800">
                                             {participants.length}
                                         </p>
                                     </div>
@@ -531,7 +558,8 @@ export default function WorkspaceTimeline() {
                             <div className="rounded-lg bg-white p-6 shadow-sm">
 
                                 <div className="mb-5 flex items-center justify-between">
-                                    <h2 className="text-lg font-semibold text-gray-800">
+                                    <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight text-slate-800">
+                                        <HiUsers className="text-base text-emerald-600" />
                                         Participants
                                     </h2>
 
@@ -589,7 +617,8 @@ export default function WorkspaceTimeline() {
                             {/* Quick Actions */}
 <div className="rounded-lg bg-white p-6 shadow-sm">
 
-    <h2 className="mb-5 text-lg font-semibold text-gray-800">
+    <h2 className="mb-5 flex items-center gap-2 text-lg font-semibold tracking-tight text-slate-800">
+        <HiSquares2X2 className="text-base text-indigo-600" />
         Quick Actions
     </h2>
 

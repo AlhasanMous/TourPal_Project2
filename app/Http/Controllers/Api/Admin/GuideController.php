@@ -11,13 +11,14 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\Admin\StoreGuideRequest;
+
 class GuideController extends Controller
 {
     // GET /api/admin/guides
     public function index(Request $request): JsonResponse
     {
         $query = Guide::with(['user', 'city', 'images'])
-                      ->withCount(['bookings', 'reviews']);
+            ->withCount(['bookings', 'reviews']);
 
         // فلترة حسب حالة التحقق
         if (!empty($request->status)) {
@@ -31,7 +32,9 @@ class GuideController extends Controller
 
         // بحث باسم المرشد
         if (!empty($request->search)) {
-            $query->whereHas('user', fn($q) =>
+            $query->whereHas(
+                'user',
+                fn($q) =>
                 $q->where('name', 'like', '%' . $request->search . '%')
             );
         }
@@ -53,55 +56,55 @@ class GuideController extends Controller
     public function show(Guide $guide): JsonResponse
     {
         $guide->load(['user', 'city', 'images'])
-              ->loadCount(['bookings', 'reviews']);
+            ->loadCount(['bookings', 'reviews']);
 
         return response()->json([
             'guide' => new AdminGuideResource($guide),
         ]);
     }
     // POST /api/admin/guides
-public function store(StoreGuideRequest $request): JsonResponse
-{
-    // تحقق إن المستخدم ما عنده profile مرشد مسبقاً
-    $exists = Guide::where('user_id', $request->user_id)->exists();
+    public function store(StoreGuideRequest $request): JsonResponse
+    {
+        // تحقق إن المستخدم ما عنده profile مرشد مسبقاً
+        $exists = Guide::where('user_id', $request->user_id)->exists();
 
-    if ($exists) {
-        return response()->json([
-            'message' => 'هذا المستخدم لديه حساب مرشد مسبقاً',
-        ], 422);
-    }
-
-    $guide = DB::transaction(function () use ($request) {
-        $guide = Guide::create([
-            'user_id'             => $request->user_id,
-            'city_id'             => $request->city_id,
-            'verification_status' => 'pending',
-            'specializations'     => $request->specializations,
-            'availability'        => $request->availability ?? [],
-        ]);
-
-        // تأكد إن المستخدم عنده role guide
-        $user = $guide->user;
-        if (!$user->hasRole('guide')) {
-            $user->assignRole('guide');
+        if ($exists) {
+            return response()->json([
+                'message' => 'هذا المستخدم لديه حساب مرشد مسبقاً',
+            ], 422);
         }
 
-        return $guide;
-    });
+        $guide = DB::transaction(function () use ($request) {
+            $guide = Guide::create([
+                'user_id'             => $request->user_id,
+                'city_id'             => $request->city_id,
+                'verification_status' => 'pending',
+                'specializations'     => $request->specializations,
+                'availability'        => $request->availability ?? [],
+            ]);
 
-    $guide->load(['user', 'city']);
+            // تأكد إن المستخدم عنده role guide
+            $user = $guide->user;
+            if (!$user->hasRole('guide')) {
+                $user->assignRole('guide');
+            }
 
-    return response()->json([
-        'message' => 'تم إنشاء حساب المرشد بنجاح',
-        'guide'   => new AdminGuideResource($guide),
-    ], 201);
-}
+            return $guide;
+        });
+
+        $guide->load(['user', 'city']);
+
+        return response()->json([
+            'message' => 'تم إنشاء حساب المرشد بنجاح',
+            'guide'   => new AdminGuideResource($guide),
+        ], 201);
+    }
 
     // POST /api/admin/guides/{guide}/verify
     public function verify(VerifyGuideRequest $request, Guide $guide): JsonResponse
     {
         // ما نعيد التحقق من مرشد محقق مسبقاً
-        if ($guide->verification_status === 'verified' && $request->action === 'verify') {
+        if ($guide->verification_status === 'approved' && $request->action === 'verify') {
             return response()->json([
                 'message' => 'المرشد محقق مسبقاً',
             ], 422);
@@ -110,7 +113,7 @@ public function store(StoreGuideRequest $request): JsonResponse
         DB::transaction(function () use ($request, $guide) {
             if ($request->action === 'verify') {
                 $guide->update([
-                    'verification_status' => 'verified',
+                    'verification_status' => 'approved',
                     'verified_at'         => now(),
                     'rejection_reason'    => null,
                 ]);

@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+
 import userService from '../../services/userService';
 
 import PageHeader from '../../components/layout/PageHeader';
@@ -7,7 +9,20 @@ import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Loading from '../../components/common/Loading';
 import ErrorMessage from '../../components/common/ErrorMessage';
-import { Link } from 'react-router-dom';
+
+import {
+    Search as SearchIcon,
+    ShieldCheck,
+    ShieldOff,
+    Trash2,
+    Pencil,
+    Eye,
+    RotateCcw,
+    ChevronLeft,
+    ChevronRight,
+    SlidersHorizontal,
+} from 'lucide-react';
+
 export default function UsersList() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -134,6 +149,21 @@ export default function UsersList() {
         return user.roles.join(', ');
     };
 
+    // small role -> ring color map, purely visual
+    const roleRingClass = (user) => {
+        const primary = user.roles?.[0];
+        switch (primary) {
+            case 'admin':
+                return 'ring-violet-200 bg-violet-50 text-violet-700';
+            case 'guide':
+                return 'ring-teal-200 bg-teal-50 text-teal-700';
+            case 'host':
+                return 'ring-amber-200 bg-amber-50 text-amber-700';
+            default:
+                return 'ring-indigo-200 bg-indigo-50 text-indigo-700';
+        }
+    };
+
     const columns = [
         {
             key: 'name',
@@ -144,20 +174,22 @@ export default function UsersList() {
                         <img
                             src={user.profile_photo}
                             alt={user.name}
-                            className="h-10 w-10 rounded-full object-cover"
+                            className={`h-10 w-10 rounded-full object-cover ring-2 ring-offset-2 ${roleRingClass(user)}`}
                         />
                     ) : (
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold text-gray-600">
+                        <div
+                            className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold ring-2 ring-offset-2 ${roleRingClass(user)}`}
+                        >
                             {user.name?.charAt(0)?.toUpperCase() ?? '?'}
                         </div>
                     )}
 
                     <div>
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium text-slate-900">
                             {user.name}
                         </div>
 
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-slate-400">
                             {user.email}
                         </div>
                     </div>
@@ -169,7 +201,7 @@ export default function UsersList() {
             key: 'roles',
             label: 'Role',
             render: (user) => (
-                <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
+                <span className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium capitalize text-indigo-700 ring-1 ring-inset ring-indigo-200">
                     {getRoles(user)}
                 </span>
             ),
@@ -180,12 +212,17 @@ export default function UsersList() {
             label: 'Verification',
             render: (user) => (
                 <span
-                    className={`rounded-full px-2 py-1 text-xs font-medium ${
+                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${
                         user.email_verified_at
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-yellow-100 text-yellow-700'
+                            ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
+                            : 'bg-amber-50 text-amber-700 ring-amber-200'
                     }`}
                 >
+                    <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                            user.email_verified_at ? 'bg-emerald-500' : 'bg-amber-500'
+                        }`}
+                    />
                     {user.email_verified_at
                         ? 'Verified'
                         : 'Not verified'}
@@ -198,12 +235,17 @@ export default function UsersList() {
             label: 'Status',
             render: (user) => (
                 <span
-                    className={`rounded-full px-2 py-1 text-xs font-medium ${
+                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${
                         user.is_deleted
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-green-100 text-green-700'
+                            ? 'bg-rose-50 text-rose-700 ring-rose-200'
+                            : 'bg-emerald-50 text-emerald-700 ring-emerald-200'
                     }`}
                 >
+                    <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                            user.is_deleted ? 'bg-rose-500' : 'bg-emerald-500'
+                        }`}
+                    />
                     {user.is_deleted ? 'Deleted' : 'Active'}
                 </span>
             ),
@@ -215,28 +257,32 @@ export default function UsersList() {
             render: (user) =>
                 user.guide ? (
                     <div className="text-sm">
-                        <div>{user.guide.city ?? '-'}</div>
-                        <div className="text-xs text-gray-500">
+                        <div className="font-medium text-slate-700">{user.guide.city ?? '-'}</div>
+                        <div className="text-xs text-slate-400">
                             {user.guide.verification_status ?? '-'}
                         </div>
                     </div>
                 ) : (
-                    '-'
+                    <span className="text-slate-300">-</span>
                 ),
         },
 
         {
             key: 'accommodations_count',
             label: 'Accommodations',
-            render: (user) =>
-                user.accommodations_count ?? 0,
+            render: (user) => (
+                <span className="font-medium text-slate-700">
+                    {user.accommodations_count ?? 0}
+                </span>
+            ),
         },
 
         {
             key: 'created_at',
             label: 'Created',
-            render: (user) =>
-                formatDate(user.created_at),
+            render: (user) => (
+                <span className="text-slate-500">{formatDate(user.created_at)}</span>
+            ),
         },
     ];
 
@@ -247,7 +293,7 @@ export default function UsersList() {
                 subtitle="Manage TourPal users."
             />
 
-            <div className="mb-6 rounded-lg bg-white p-4 shadow-sm">
+            <div className="mb-6 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
                 <form
                     onSubmit={handleSearch}
                     className="flex flex-col gap-4 md:flex-row md:items-end"
@@ -265,14 +311,15 @@ export default function UsersList() {
                     </div>
 
                     <div className="md:w-48">
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
+                        <label className="mb-1 flex items-center gap-1.5 text-sm font-medium text-slate-600">
+                            <SlidersHorizontal className="h-3.5 w-3.5 text-slate-400" />
                             Role
                         </label>
 
                         <select
                             value={role}
                             onChange={handleRoleChange}
-                            className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
                         >
                             <option value="">All roles</option>
                             <option value="admin">Admin</option>
@@ -290,18 +337,20 @@ export default function UsersList() {
                             onChange={(e) =>
                                 setShowDeleted(e.target.checked)
                             }
-                            className="h-4 w-4"
+                            className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-400"
                         />
 
                         <label
                             htmlFor="showDeleted"
-                            className="text-sm text-gray-700"
+                            className="flex items-center gap-1.5 text-sm text-slate-600"
                         >
+                            <Trash2 className="h-3.5 w-3.5 text-slate-400" />
                             Deleted only
                         </label>
                     </div>
 
                     <Button type="submit">
+                        <SearchIcon className="mr-1.5 inline-block h-4 w-4" />
                         Search
                     </Button>
                 </form>
@@ -313,69 +362,76 @@ export default function UsersList() {
                 <Loading />
             ) : (
                 <>
-                    <DataTable
-                        columns={columns}
-                        data={users}
-                        emptyMessage="No users found."
-                        actions={(user) => (
-
-
-
-
-                            <div className="flex items-center justify-end gap-2">
-                                <Button
-                                    variant="secondary"
-                                    onClick={() =>
-                                        handleVerification(user)
-                                    }
-                                >
-                                    {user.email_verified_at
-                                        ? 'Unverify'
-                                        : 'Verify'}
-                                </Button>
-
-<Link to={`/users/${user.id}/edit`}>
-    <Button variant="secondary">
-        Edit
-    </Button>
-</Link>
-
-
-<Link to={`/users/${user.id}`}>
-    <Button variant="secondary">
-        View
-    </Button>
-</Link>
-
-                                {user.is_deleted ? (
+                    <div className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-sm">
+                        <DataTable
+                            columns={columns}
+                            data={users}
+                            emptyMessage="No users found."
+                            actions={(user) => (
+                                <div className="flex flex-wrap items-center justify-end gap-2">
                                     <Button
                                         variant="secondary"
                                         onClick={() =>
-                                            handleRestore(user)
+                                            handleVerification(user)
                                         }
                                     >
-                                        Restore
+                                        {user.email_verified_at ? (
+                                            <ShieldOff className="mr-1.5 inline-block h-4 w-4 text-amber-600" />
+                                        ) : (
+                                            <ShieldCheck className="mr-1.5 inline-block h-4 w-4 text-emerald-600" />
+                                        )}
+                                        {user.email_verified_at
+                                            ? 'Unverify'
+                                            : 'Verify'}
                                     </Button>
-                                ) : (
-                                    <Button
-                                        variant="danger"
-                                        onClick={() =>
-                                            handleDelete(user)
-                                        }
-                                    >
-                                        Delete
-                                    </Button>
-                                )}
-                            </div>
-                        )}
-                    />
+
+                                    <Link to={`/users/${user.id}/edit`}>
+                                        <Button variant="secondary">
+                                            <Pencil className="mr-1.5 inline-block h-4 w-4 text-indigo-600" />
+                                            Edit
+                                        </Button>
+                                    </Link>
+
+                                    <Link to={`/users/${user.id}`}>
+                                        <Button variant="secondary">
+                                            <Eye className="mr-1.5 inline-block h-4 w-4 text-slate-600" />
+                                            View
+                                        </Button>
+                                    </Link>
+
+                                    {user.is_deleted ? (
+                                        <Button
+                                            variant="secondary"
+                                            onClick={() =>
+                                                handleRestore(user)
+                                            }
+                                        >
+                                            <RotateCcw className="mr-1.5 inline-block h-4 w-4 text-teal-600" />
+                                            Restore
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant="danger"
+                                            onClick={() =>
+                                                handleDelete(user)
+                                            }
+                                        >
+                                            <Trash2 className="mr-1.5 inline-block h-4 w-4" />
+                                            Delete
+                                        </Button>
+                                    )}
+                                </div>
+                            )}
+                        />
+                    </div>
 
                     {meta && meta.last_page > 1 && (
                         <div className="mt-6 flex items-center justify-between">
-                            <p className="text-sm text-gray-600">
-                                Page {meta.current_page} of{' '}
-                                {meta.last_page}
-                                {' '}({meta.total} total)
+                            <p className="text-sm text-slate-500">
+                                Page <span className="font-medium text-slate-700">{meta.current_page}</span> of{' '}
+                                <span className="font-medium text-slate-700">{meta.last_page}</span>
+                                {' '}
+                                <span className="text-slate-400">({meta.total} total)</span>
                             </p>
 
                             <div className="flex gap-2">
@@ -390,6 +446,7 @@ export default function UsersList() {
                                         )
                                     }
                                 >
+                                    <ChevronLeft className="mr-1 inline-block h-4 w-4" />
                                     Previous
                                 </Button>
 
@@ -406,6 +463,7 @@ export default function UsersList() {
                                     }
                                 >
                                     Next
+                                    <ChevronRight className="ml-1 inline-block h-4 w-4" />
                                 </Button>
                             </div>
                         </div>
