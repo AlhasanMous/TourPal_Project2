@@ -6,6 +6,8 @@ import {
     MapPin,
     Briefcase,
     UserCheck,
+     Hotel,
+      Bus,
 } from 'lucide-react';
 
 const menuItems = [
@@ -15,6 +17,8 @@ const menuItems = [
     { name: 'Cities', path: '/cities', icon: Building2 },
     { name: 'Places', path: '/places', icon: MapPin },
     { name: 'Workspaces', path: '/workspaces', icon: Briefcase },
+       { name: 'Accommodations', path: '/accommodations', icon: Hotel },
+       { name: 'Transport', path: '/transport', icon: Bus },
 ];
 
 export default function Sidebar() {

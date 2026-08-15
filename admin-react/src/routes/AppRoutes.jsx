@@ -27,6 +27,19 @@ import WorkspacePlaces from '../pages/workspaces/WorkspacePlaces';
 import UsersList from '../pages/users/UsersList';
 import EditUser from '../pages/users/EditUser';
 import ViewUser from '../pages/users/ViewUser';
+
+
+import AccommodationsList from '../pages/accommodations/AccommodationsList';
+import PendingAccommodations from '../pages/accommodations/PendingAccommodations';
+import AccommodationDetails from '../pages/accommodations/AccommodationDetails';
+
+
+import TransportManagement from '../pages/transport/TransportManagement';
+import CreateTransportCompany from '../pages/transport/CreateTransportCompany';
+import EditTransportCompany from '../pages/transport/EditTransportCompany';
+import CreateTransportRoute from '../pages/transport/CreateTransportRoute';
+import EditTransportRoute from '../pages/transport/EditTransportRoute';
+
 export default function AppRoutes() {
     return (
         <Routes>
@@ -55,6 +68,57 @@ export default function AppRoutes() {
                 <Route path="/places" element={<PlacesList />} />
                 <Route path="/places/create" element={<CreatePlace />} />
                 <Route path="/places/:id/edit" element={<EditPlace />} />
+
+
+
+
+<Route
+    path="/transport"
+    element={<TransportManagement />}
+/>
+
+<Route
+    path="/transport/companies/create"
+    element={<CreateTransportCompany />}
+/>
+
+<Route
+    path="/transport/companies/:id/edit"
+    element={<EditTransportCompany />}
+/>
+
+<Route
+    path="/transport/routes/create"
+    element={<CreateTransportRoute />}
+/>
+
+
+<Route
+    path="/transport/routes/:id/edit"
+    element={<EditTransportRoute />}
+/>
+
+
+
+
+
+<Route
+    path="/accommodations"
+    element={<AccommodationsList />}
+/>
+<Route
+    path="/accommodations/pending"
+    element={<PendingAccommodations />}
+/>
+
+<Route
+    path="/accommodations/:id"
+    element={<AccommodationDetails />}
+/>
+
+
+
+
           <Route path="/workspaces" element={<WorkspacesList />} />
 <Route
     path="/workspaces/:id/timeline"
@@ -78,6 +142,14 @@ export default function AppRoutes() {
                 <Route path="/guides/:id" element={<GuideDetails />} />
 
 </Route>
+
+
+
+
+
+
+
+
 
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
