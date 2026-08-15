@@ -19,6 +19,8 @@ class StoreAccommodationRequest extends FormRequest
             'city_id'      => ['required', 'integer', 'exists:cities,id'],
             'capacity'     => ['required', 'integer', 'min:1'],
             'price_range'  => ['nullable', 'string', 'max:50'],
+            'image'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120', 'required_without:image_url'],
+'image_url' => ['nullable', 'url', 'required_without:image'],
         ];
     }
 
@@ -34,6 +36,10 @@ class StoreAccommodationRequest extends FormRequest
             'city_id.exists'        => 'المدينة غير موجودة',
             'capacity.required'     => 'السعة مطلوبة',
             'capacity.min'          => 'السعة يجب أن تكون 1 على الأقل',
+            'image.image'   => 'الملف يجب أن يكون صورة',
+'image.mimes'   => 'صيغة الصورة يجب أن تكون: jpg, jpeg, png, webp',
+'image.max'     => 'حجم الصورة يجب أن لا يتجاوز 5MB',
+'image_url.url' => 'رابط الصورة غير صالح',
         ];
     }
 }

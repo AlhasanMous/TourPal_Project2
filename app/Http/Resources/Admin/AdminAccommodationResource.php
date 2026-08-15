@@ -39,4 +39,10 @@ class AdminAccommodationResource extends JsonResource
             'reviews_count'    => $this->whenCounted('reviews'),
         ];
     }
+    private function imageUrl(?string $url): ?string
+{
+    if (!$url) return null;
+    if (str_starts_with($url, 'http')) return $url;
+    return asset($url);
+}
 }

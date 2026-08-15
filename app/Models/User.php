@@ -25,7 +25,7 @@ class User extends Authenticatable
         'languages',
         'is_matching_enabled',
     ];
-
+protected $guard_name = 'api';
     protected $hidden = [
         'password_hash',
     ];
