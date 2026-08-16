@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Notification extends Model
 {
-    public $timestamps = false;
-
     protected $fillable = [
         'user_id',
         'type',
@@ -22,6 +20,7 @@ class Notification extends Model
             'data'       => 'array',
             'read_at'    => 'datetime',
             'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 
@@ -30,7 +29,6 @@ class Notification extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Helper — هل الإشعار مقروء؟
     public function isRead(): bool
     {
         return $this->read_at !== null;
