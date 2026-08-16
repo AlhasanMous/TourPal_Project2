@@ -13,8 +13,6 @@ class NotificationController extends Controller
 {
     public function __construct(private NotificationService $notificationService) {}
 
-    // GET /api/notifications
-    // GET /api/notifications?unread=1
     public function index(Request $request): JsonResponse
     {
         $notifications = $this->notificationService->getUserNotifications(
@@ -34,7 +32,6 @@ class NotificationController extends Controller
         ]);
     }
 
-    // POST /api/notifications/{notification}/read
     public function markAsRead(Request $request, Notification $notification): JsonResponse
     {
         try {
@@ -52,7 +49,6 @@ class NotificationController extends Controller
         }
     }
 
-    // POST /api/notifications/read-all
     public function markAllAsRead(Request $request): JsonResponse
     {
         $count = $this->notificationService->markAllAsRead($request->user()->id);
@@ -62,7 +58,6 @@ class NotificationController extends Controller
         ]);
     }
 
-    // DELETE /api/notifications/{notification}
     public function destroy(Request $request, Notification $notification): JsonResponse
     {
         try {
