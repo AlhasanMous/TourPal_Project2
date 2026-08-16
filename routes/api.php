@@ -26,6 +26,8 @@ use App\Http\Controllers\Api\NotificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\WishlistController;
+use App\Http\Controllers\Api\MatchingController;
+use App\Http\Controllers\Api\Admin\MatchingController as AdminMatchingController;
 // ─────────────────────────────────────────────────────────
 // Public — Auth
 // ─────────────────────────────────────────────────────────
@@ -140,6 +142,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     });
+    // Tourist Matching
+    Route::prefix('matching')->group(function () {
+    Route::get('/',                      [MatchingController::class, 'index']);
+    Route::get('/connections',           [MatchingController::class, 'connections']);
+    Route::post('/{match}/connect',      [MatchingController::class, 'connect']);
+    Route::patch('/{match}/respond',     [MatchingController::class, 'respond']);
+});
 
 }); // ← إغلاق auth:sanctum
 
@@ -191,7 +200,8 @@ Route::middleware(['auth:sanctum', 'role:admin'])
             Route::put('routes/{route}',     [TransportRouteController::class, 'update']);
             Route::delete('routes/{route}',  [TransportRouteController::class, 'destroy']);
         });
-
+        // Admin Matching
+        Route::get('matching', [AdminMatchingController::class, 'index']);
         // Accommodations
         Route::get('accommodations/pending',                 [AdminAccommodationController::class, 'pending']);
         Route::get('accommodations',                         [AdminAccommodationController::class, 'index']);
