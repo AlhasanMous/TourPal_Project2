@@ -215,4 +215,6 @@ Route::middleware(['auth:sanctum', 'role:admin'])
             Route::get('/{booking}',          [AdminAccommodationBookingController::class, 'show']);
             Route::patch('/{booking}/cancel', [AdminAccommodationBookingController::class, 'cancel']);
         });
+        Route::get('reviews',               [ReviewController::class, 'adminIndex']);
+        Route::delete('reviews/{review}',   [ReviewController::class, 'adminDestroy']);
     });
