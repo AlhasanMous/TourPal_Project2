@@ -24,7 +24,10 @@ use App\Http\Controllers\Api\Admin\AccommodationBookingController as AdminAccomm
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Api\NotificationController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\WishlistController;
+use App\Http\Controllers\Api\MatchingController;
+use App\Http\Controllers\Api\Admin\MatchingController as AdminMatchingController;
 // ─────────────────────────────────────────────────────────
 // Public — Auth
 // ─────────────────────────────────────────────────────────
@@ -52,7 +55,8 @@ Route::get('accommodations/{accommodation}', [AccommodationController::class, 's
 // Public — Workspaces
 Route::get('workspaces/public',             [WorkspaceController::class, 'publicIndex']);
 Route::get('workspaces/public/{workspace}', [WorkspaceController::class, 'showPublic']);
-
+// Public — Reviews
+Route::get('reviews', [ReviewController::class, 'index']);
 // ─────────────────────────────────────────────────────────
 // Protected — auth:sanctum
 // ─────────────────────────────────────────────────────────
@@ -100,7 +104,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('accommodations/{accommodation}', [HostAccommodationController::class, 'destroy']);
         Route::get('accommodation-bookings',            [AccommodationBookingController::class, 'hostBookings']);
     });
+  // Reviews
+    Route::post('reviews',          [ReviewController::class, 'store']);
+    Route::delete('reviews/{review}',[ReviewController::class, 'destroy']);
 
+    // Wishlist
+    Route::get('wishlist',             [WishlistController::class, 'index']);
+    Route::post('wishlist',            [WishlistController::class, 'store']);
+    Route::delete('wishlist/{placeId}',[WishlistController::class, 'destroy']);
     // Workspace sub-resources
     Route::prefix('workspaces/{workspace}')->group(function () {
 
@@ -131,6 +142,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     });
+    // Tourist Matching
+    Route::prefix('matching')->group(function () {
+    Route::get('/',                      [MatchingController::class, 'index']);
+    Route::get('/connections',           [MatchingController::class, 'connections']);
+    Route::post('/{match}/connect',      [MatchingController::class, 'connect']);
+    Route::patch('/{match}/respond',     [MatchingController::class, 'respond']);
+});
 
 }); // ← إغلاق auth:sanctum
 
@@ -149,7 +167,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])
         Route::get('users/{user}',                      [UserController::class, 'show']);
         Route::put('users/{user}',                      [UserController::class, 'update']);
         Route::delete('users/{user}',                   [UserController::class, 'destroy']);
-        Route::post('users/{user}/restore',             [UserController::class, 'restore']);
+        Route::post('users/{id}/restore', [UserController::class, 'restore']);
         Route::post('users/{user}/toggle-verification', [UserController::class, 'toggleVerification']);
 
         // Workspaces
@@ -182,7 +200,8 @@ Route::middleware(['auth:sanctum', 'role:admin'])
             Route::put('routes/{route}',     [TransportRouteController::class, 'update']);
             Route::delete('routes/{route}',  [TransportRouteController::class, 'destroy']);
         });
-
+        // Admin Matching
+        Route::get('matching', [AdminMatchingController::class, 'index']);
         // Accommodations
         Route::get('accommodations/pending',                 [AdminAccommodationController::class, 'pending']);
         Route::get('accommodations',                         [AdminAccommodationController::class, 'index']);
@@ -196,4 +215,6 @@ Route::middleware(['auth:sanctum', 'role:admin'])
             Route::get('/{booking}',          [AdminAccommodationBookingController::class, 'show']);
             Route::patch('/{booking}/cancel', [AdminAccommodationBookingController::class, 'cancel']);
         });
+        Route::get('reviews',               [ReviewController::class, 'adminIndex']);
+        Route::delete('reviews/{review}',   [ReviewController::class, 'adminDestroy']);
     });

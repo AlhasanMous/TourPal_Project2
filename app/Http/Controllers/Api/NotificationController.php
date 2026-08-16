@@ -11,7 +11,9 @@ use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-    public function __construct(private NotificationService $notificationService) {}
+    public function __construct(
+        private NotificationService $notificationService
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -22,8 +24,10 @@ class NotificationController extends Controller
 
         return response()->json([
             'notifications' => NotificationResource::collection($notifications),
-            'unread_count'  => $this->notificationService->getUnreadCount($request->user()->id),
-            'meta'          => [
+            'unread_count'  => $this->notificationService->getUnreadCount(
+                $request->user()->id
+            ),
+            'meta' => [
                 'current_page' => $notifications->currentPage(),
                 'last_page'    => $notifications->lastPage(),
                 'per_page'     => $notifications->perPage(),
@@ -32,8 +36,10 @@ class NotificationController extends Controller
         ]);
     }
 
-    public function markAsRead(Request $request, Notification $notification): JsonResponse
-    {
+    public function markAsRead(
+        Request $request,
+        Notification $notification
+    ): JsonResponse {
         try {
             $notification = $this->notificationService->markAsRead(
                 $notification,
@@ -45,29 +51,40 @@ class NotificationController extends Controller
                 'notification' => new NotificationResource($notification),
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 403);
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 403);
         }
     }
 
     public function markAllAsRead(Request $request): JsonResponse
     {
-        $count = $this->notificationService->markAllAsRead($request->user()->id);
+        $count = $this->notificationService->markAllAsRead(
+            $request->user()->id
+        );
 
         return response()->json([
             'message' => "تم تعيين {$count} إشعار كمقروء",
         ]);
     }
 
-    public function destroy(Request $request, Notification $notification): JsonResponse
-    {
+    public function destroy(
+        Request $request,
+        Notification $notification
+    ): JsonResponse {
         try {
-            $this->notificationService->delete($notification, $request->user()->id);
+            $this->notificationService->delete(
+                $notification,
+                $request->user()->id
+            );
 
             return response()->json([
                 'message' => 'تم حذف الإشعار بنجاح',
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 403);
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 403);
         }
     }
 }

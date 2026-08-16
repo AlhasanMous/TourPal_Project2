@@ -60,7 +60,7 @@ class Guide extends Model
     //     return $this->morphMany(Image::class, 'imageable')
     //                 ->where('is_main', true);
     // }
-    // الصح ✅
+    
     public function mainImage(): MorphOne
     {
         return $this->morphOne(Image::class, 'imageable')

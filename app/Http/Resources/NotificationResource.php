@@ -9,10 +9,24 @@ class NotificationResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $inviter = $this->relationLoaded('inviter')
+            ? $this->inviter
+            : null;
+
         return [
             'id'         => $this->id,
             'type'       => $this->type,
             'data'       => $this->data,
+
+            'inviter' => $this->when(
+                $this->type === 'workspace_invite',
+                $inviter ? [
+                    'id'            => $inviter->id,
+                    'name'          => $inviter->name,
+                    'profile_photo' => $inviter->profile_photo,
+                ] : null
+            ),
+
             'read_at'    => $this->read_at,
             'is_read'    => !is_null($this->read_at),
             'created_at' => $this->created_at,
