@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\AccommodationBookingController;
 use App\Http\Controllers\Api\Admin\AccommodationBookingController as AdminAccommodationBookingController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\NotificationController;
 // ─────────────────────────────────────────────────────────
 // Public — Auth
 // ─────────────────────────────────────────────────────────
@@ -68,7 +69,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('profile',  [GuideProfileController::class, 'show']);
         Route::put('profile',  [GuideProfileController::class, 'update']);
     });
-
+    Route::prefix('notifications')->group(function () {
+    Route::get('/',                          [NotificationController::class, 'index']);
+    Route::post('read-all',                  [NotificationController::class, 'markAllAsRead']);
+    Route::post('{notification}/read',       [NotificationController::class, 'markAsRead']);
+    Route::delete('{notification}',          [NotificationController::class, 'destroy']);
+    });
     // Workspaces CRUD
     Route::apiResource('workspaces', WorkspaceController::class);
 
@@ -117,245 +123,78 @@ Route::patch('accommodation-bookings/{booking}/cancel',  [AccommodationBookingCo
         Route::post('suggestions',                  [WorkspaceSuggestionController::class, 'store']);
         Route::post('suggestions/{suggestion}/respond', [WorkspaceSuggestionController::class, 'respond']);// ─── Host ─────────────────────────────────────────────────
 
-Route::prefix('host')->group(function () {
-    Route::get(
-        'accommodations',
-        [HostAccommodationController::class, 'index']
-    );
+    // ─── Host ─────────────────────────────────────────────────
 
-    Route::get(
-        'accommodation-bookings',
-        [AccommodationBookingController::class, 'hostBookings']
-    );
+        Route::prefix('host')->group(function () {
+            Route::get('accommodations',                    [HostAccommodationController::class, 'index']);
+            Route::get('accommodation-bookings',             [AccommodationBookingController::class, 'hostBookings']);
+            Route::post('accommodations',                   [HostAccommodationController::class, 'store']);
+            Route::put('accommodations/{accommodation}',    [HostAccommodationController::class, 'update']);
+            Route::delete('accommodations/{accommodation}', [HostAccommodationController::class, 'destroy']);
+        });
+    });
 
-    Route::post(
-        'accommodations',
-        [HostAccommodationController::class, 'store']
-    );
-
-    Route::put(
-        'accommodations/{accommodation}',
-        [HostAccommodationController::class, 'update']
-    );
-
-    Route::delete(
-        'accommodations/{accommodation}',
-        [HostAccommodationController::class, 'destroy']
-    );
-});
-
-
+}); // ← إغلاق auth:sanctum
 // ─────────────────────────────────────────────────────────
 // Admin only — auth:sanctum + role:admin
 // ─────────────────────────────────────────────────────────
 
-Route::middleware(['auth:sanctum', 'role:admin'])
-    ->prefix('admin')
-    ->group(function () {
+Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
 
-        // ─────────────────────────────────────────
-        // Cities + Places CRUD
-        // ─────────────────────────────────────────
+    // Cities + Places CRUD
+    Route::apiResource('cities', CityController::class);
+    Route::apiResource('places', PlaceController::class);
 
-        Route::apiResource('cities', CityController::class);
-        Route::apiResource('places', PlaceController::class);
+    // Users Management
+    Route::get('users',                             [UserController::class, 'index']);
+    Route::get('users/{user}',                      [UserController::class, 'show']);
+    Route::put('users/{user}',                      [UserController::class, 'update']);
+    Route::delete('users/{user}',                   [UserController::class, 'destroy']);
+    Route::post('users/{user}/restore',             [UserController::class, 'restore']);
+    Route::post('users/{user}/toggle-verification', [UserController::class, 'toggleVerification']);
 
+    // Workspaces
+    Route::prefix('workspaces')->group(function () {
+        Route::get('/',                        [AdminWorkspaceController::class, 'index']);
+        Route::get('/{workspace}',             [AdminWorkspaceController::class, 'show']);
+        Route::delete('/{workspace}',          [AdminWorkspaceController::class, 'destroy']);
+        Route::get('/{workspace}/participants',[AdminWorkspaceController::class, 'participants']);
+        Route::get('/{workspace}/places',      [AdminWorkspaceController::class, 'places']);
+        Route::get('/{workspace}/timeline',    [AdminWorkspaceController::class, 'timeline']);
+        Route::get('/{workspace}/suggestions', [AdminWorkspaceController::class, 'suggestions']);
+    });
 
-        // ─────────────────────────────────────────
-        // Users Management
-        // ─────────────────────────────────────────
+    // Guides
+    Route::get('guides/pending',         [AdminGuideController::class, 'pending']);
+    Route::get('guides',                 [AdminGuideController::class, 'index']);
+    Route::post('guides',                [AdminGuideController::class, 'store']);
+    Route::get('guides/{guide}',         [AdminGuideController::class, 'show']);
+    Route::post('guides/{guide}/verify', [AdminGuideController::class, 'verify']);
 
-        Route::get('users', [UserController::class, 'index']);
-        Route::get('users/{user}', [UserController::class, 'show']);
-        Route::put('users/{user}', [UserController::class, 'update']);
-        Route::delete('users/{user}', [UserController::class, 'destroy']);
+    // Transport
+    Route::prefix('transport')->group(function () {
+        Route::get('companies',              [TransportCompanyController::class, 'index']);
+        Route::post('companies',             [TransportCompanyController::class, 'store']);
+        Route::put('companies/{company}',    [TransportCompanyController::class, 'update']);
+        Route::delete('companies/{company}', [TransportCompanyController::class, 'destroy']);
 
-        Route::post(
-            'users/{user}/restore',
-            [UserController::class, 'restore']
-        );
+        Route::get('routes',             [TransportRouteController::class, 'index']);
+        Route::post('routes',            [TransportRouteController::class, 'store']);
+        Route::put('routes/{route}',     [TransportRouteController::class, 'update']);
+        Route::delete('routes/{route}',  [TransportRouteController::class, 'destroy']);
+    });
 
-        Route::post(
-            'users/{user}/toggle-verification',
-            [UserController::class, 'toggleVerification']
-        );
+    // Accommodations
+    Route::get('accommodations/pending',         [AdminAccommodationController::class, 'pending']);
+    Route::get('accommodations',                 [AdminAccommodationController::class, 'index']);
+    Route::post('accommodations',                [AdminAccommodationController::class, 'store']);
+    Route::get('accommodations/{accommodation}', [AdminAccommodationController::class, 'show']);
+    Route::post('accommodations/{accommodation}/verify', [AdminAccommodationController::class, 'verify']);
 
-
-        // ─────────────────────────────────────────
-        // Workspaces
-        // ─────────────────────────────────────────
-
-        Route::prefix('workspaces')->group(function () {
-
-            Route::get(
-                '/',
-                [AdminWorkspaceController::class, 'index']
-            );
-
-            Route::get(
-                '/{workspace}',
-                [AdminWorkspaceController::class, 'show']
-            );
-
-            Route::delete(
-                '/{workspace}',
-                [AdminWorkspaceController::class, 'destroy']
-            );
-
-            Route::get(
-                '/{workspace}/participants',
-                [AdminWorkspaceController::class, 'participants']
-            );
-
-            Route::get(
-                '/{workspace}/places',
-                [AdminWorkspaceController::class, 'places']
-            );
-
-            Route::get(
-                '/{workspace}/timeline',
-                [AdminWorkspaceController::class, 'timeline']
-            );
-
-            Route::get(
-                '/{workspace}/suggestions',
-                [AdminWorkspaceController::class, 'suggestions']
-            );
-        });
-
-
-        // ─────────────────────────────────────────
-        // Guides
-        // ─────────────────────────────────────────
-
-        Route::get(
-            'guides/pending',
-            [AdminGuideController::class, 'pending']
-        );
-
-        Route::get(
-            'guides',
-            [AdminGuideController::class, 'index']
-        );
-
-        Route::post(
-            'guides',
-            [AdminGuideController::class, 'store']
-        );
-
-        Route::get(
-            'guides/{guide}',
-            [AdminGuideController::class, 'show']
-        );
-
-        Route::post(
-            'guides/{guide}/verify',
-            [AdminGuideController::class, 'verify']
-        );
-
-
-        // ─────────────────────────────────────────
-        // Transport
-        // ─────────────────────────────────────────
-
-        Route::prefix('transport')->group(function () {
-
-            // Companies
-
-            Route::get(
-                'companies',
-                [TransportCompanyController::class, 'index']
-            );
-
-            Route::post(
-                'companies',
-                [TransportCompanyController::class, 'store']
-            );
-
-            Route::put(
-                'companies/{company}',
-                [TransportCompanyController::class, 'update']
-            );
-
-            Route::delete(
-                'companies/{company}',
-                [TransportCompanyController::class, 'destroy']
-            );
-
-
-            // Routes
-
-            Route::get(
-                'routes',
-                [TransportRouteController::class, 'index']
-            );
-
-            Route::post(
-                'routes',
-                [TransportRouteController::class, 'store']
-            );
-
-            Route::put(
-                'routes/{route}',
-                [TransportRouteController::class, 'update']
-            );
-
-            Route::delete(
-                'routes/{route}',
-                [TransportRouteController::class, 'destroy']
-            );
-        });
-
-
-        // ─────────────────────────────────────────
-        // Accommodations
-        // ─────────────────────────────────────────
-
-        Route::get(
-            'accommodations/pending',
-            [AdminAccommodationController::class, 'pending']
-        );
-
-        Route::get(
-            'accommodations',
-            [AdminAccommodationController::class, 'index']
-        );
-
-        Route::post(
-            'accommodations',
-            [AdminAccommodationController::class, 'store']
-        );
-
-        Route::get(
-            'accommodations/{accommodation}',
-            [AdminAccommodationController::class, 'show']
-        );
-
-        Route::post(
-            'accommodations/{accommodation}/verify',
-            [AdminAccommodationController::class, 'verify']
-        );
-
-
-        // ─────────────────────────────────────────
-        // Accommodation Bookings
-        // ─────────────────────────────────────────
-
-        Route::prefix('accommodation-bookings')->group(function () {
-
-            Route::get(
-                '/',
-                [AdminAccommodationBookingController::class, 'index']
-            );
-
-            Route::get(
-                '/{booking}',
-                [AdminAccommodationBookingController::class, 'show']
-            );
-
-            Route::patch(
-                '/{booking}/cancel',
-                [AdminAccommodationBookingController::class, 'cancel']
-          );
-        });
-    });    });    });
+    // Accommodation Bookings
+    Route::prefix('accommodation-bookings')->group(function () {
+        Route::get('/',             [AdminAccommodationBookingController::class, 'index']);
+        Route::get('/{booking}',    [AdminAccommodationBookingController::class, 'show']);
+        Route::patch('/{booking}/cancel', [AdminAccommodationBookingController::class, 'cancel']);
+    });
+});
