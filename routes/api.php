@@ -24,7 +24,8 @@ use App\Http\Controllers\Api\Admin\AccommodationBookingController as AdminAccomm
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Api\NotificationController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\WishlistController;
 // ─────────────────────────────────────────────────────────
 // Public — Auth
 // ─────────────────────────────────────────────────────────
@@ -52,7 +53,8 @@ Route::get('accommodations/{accommodation}', [AccommodationController::class, 's
 // Public — Workspaces
 Route::get('workspaces/public',             [WorkspaceController::class, 'publicIndex']);
 Route::get('workspaces/public/{workspace}', [WorkspaceController::class, 'showPublic']);
-
+// Public — Reviews
+Route::get('reviews', [ReviewController::class, 'index']);
 // ─────────────────────────────────────────────────────────
 // Protected — auth:sanctum
 // ─────────────────────────────────────────────────────────
@@ -100,7 +102,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('accommodations/{accommodation}', [HostAccommodationController::class, 'destroy']);
         Route::get('accommodation-bookings',            [AccommodationBookingController::class, 'hostBookings']);
     });
+  // Reviews
+    Route::post('reviews',          [ReviewController::class, 'store']);
+    Route::delete('reviews/{review}',[ReviewController::class, 'destroy']);
 
+    // Wishlist
+    Route::get('wishlist',             [WishlistController::class, 'index']);
+    Route::post('wishlist',            [WishlistController::class, 'store']);
+    Route::delete('wishlist/{placeId}',[WishlistController::class, 'destroy']);
     // Workspace sub-resources
     Route::prefix('workspaces/{workspace}')->group(function () {
 
