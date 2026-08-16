@@ -42,6 +42,12 @@ Route::get('guides/{guide}', [GuideController::class, 'show']);
 // ─── Public - Accommodations ──────────────────────────────────────────────
 Route::get('accommodations',                [AccommodationController::class, 'index']);
 Route::get('accommodations/{accommodation}',[AccommodationController::class, 'show']);
+
+//  show all public workspaces 
+Route::get('workspaces/public',         [WorkspaceController::class, 'publicIndex']);
+Route::get('workspaces/public/{workspace}',[WorkspaceController::class, 'showPublic']);
+
+
 // ─────────────────────────────────────────────────────────
 // Protected — auth:sanctum
 // ─────────────────────────────────────────────────────────
@@ -61,6 +67,7 @@ Route::middleware('auth:sanctum')->group(function ()
 
     // Workspaces CRUD
     Route::apiResource('workspaces', WorkspaceController::class);
+
 
             // Guide Bookings
     Route::post('guide-bookings',                    [GuideBookingController::class, 'store']);
@@ -95,21 +102,21 @@ Route::middleware('auth:sanctum')->group(function ()
         Route::get('suggestions/pending',           [WorkspaceSuggestionController::class, 'pending']);
         Route::post('suggestions',                  [WorkspaceSuggestionController::class, 'store']);
         Route::post('suggestions/{suggestion}/respond', [WorkspaceSuggestionController::class, 'respond']);
-
-
-    });
-    
-});
-
 // ─── Host ─────────────────────────────────────────────────
-Route::middleware('auth:sanctum')->group(function () {
+
     Route::prefix('host')->group(function () {
         Route::get('accommodations',                    [HostAccommodationController::class, 'index']);
         Route::post('accommodations',                   [HostAccommodationController::class, 'store']);
         Route::put('accommodations/{accommodation}',    [HostAccommodationController::class, 'update']);
         Route::delete('accommodations/{accommodation}', [HostAccommodationController::class, 'destroy']);
     });
+
+
+    });
+    
 });
+
+
 // ─────────────────────────────────────────────────────────
 // Admin only — auth:sanctum + role:admin
 // ─────────────────────────────────────────────────────────

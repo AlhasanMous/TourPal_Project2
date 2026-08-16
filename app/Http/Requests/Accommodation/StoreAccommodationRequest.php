@@ -19,7 +19,7 @@ class StoreAccommodationRequest extends FormRequest
             : $this->route('accommodation');
 
         return [
-            'host_user_id' => ['required', 'integer', 'exists:users,id'],
+            // 'host_user_id' => ['required', 'integer', 'exists:users,id'],
             'name'        => [
                 'required',
                 'string',
@@ -46,23 +46,23 @@ class StoreAccommodationRequest extends FormRequest
         ];
     }
 
-    public function messages(): array
-    {
-        return [
-            'name.required'     => 'اسم مكان الإقامة مطلوب',
-            'name.unique'       => 'هذا الاسم مستخدم مسبقاً',
-            'type.required'     => 'نوع مكان الإقامة مطلوب',
-            'host_user_id.required' => 'المضيف مطلوب',
-            'host_user_id.exists'   => 'المستخدم غير موجود',
-            'type.in'           => 'النوع يجب أن يكون: hotel, hostel, shared',
-            'city_id.required'  => 'المدينة مطلوبة',
-            'city_id.exists'    => 'المدينة غير موجودة',
-            'capacity.required' => 'السعة مطلوبة',
-            'capacity.min'      => 'السعة يجب أن تكون 1 على الأقل',
-            'image.image'       => 'الملف يجب أن يكون صورة',
-            'image.mimes'       => 'صيغة الصورة يجب أن تكون: jpg, jpeg, png, webp',
-            'image.max'         => 'حجم الصورة يجب أن لا يتجاوز 5MB',
-            'image_url.url'     => 'رابط الصورة غير صالح',
-        ];
-    }
+public function messages(): array
+{
+    return [
+        'name.required'              => 'اسم مكان الإقامة مطلوب',
+        'name.unique'                => 'هذا الاسم مستخدم مسبقاً',
+        'type.required'              => 'نوع مكان الإقامة مطلوب',
+        'type.in'                    => 'النوع يجب أن يكون: hotel, hostel, shared',
+        'city_id.required'           => 'المدينة مطلوبة',
+        'city_id.exists'             => 'المدينة غير موجودة',
+        'capacity.required'          => 'السعة مطلوبة',
+        'capacity.min'               => 'السعة يجب أن تكون 1 على الأقل',
+        'image.image'                => 'الملف يجب أن يكون صورة',
+        'image.mimes'                => 'صيغة الصورة يجب أن تكون: jpg, jpeg, png, webp',
+        'image.max'                  => 'حجم الصورة يجب أن لا يتجاوز 5MB',
+        'image_url.url'              => 'رابط الصورة غير صالح',
+        'image.required_without'     => 'الصورة مطلوبة إذا لم يتم إدخال رابط', // ← أضف
+        'image_url.required_without' => 'رابط الصورة مطلوب إذا لم يتم رفع صورة', // ← أضف
+    ];
+}
 }

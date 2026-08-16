@@ -40,6 +40,39 @@ class WorkspaceController extends Controller
         ]);
     }
 
+// GET /api/workspaces/public
+public function publicIndex(Request $request): JsonResponse
+{
+    $workspaces = $this->workspaceService->getPublicWorkspaces(
+        $request->only(['search', 'start_date'])
+    );
+
+    return response()->json([
+        'workspaces' => WorkspaceResource::collection($workspaces),
+        'meta'       => [
+            'current_page' => $workspaces->currentPage(),
+            'last_page'    => $workspaces->lastPage(),
+            'per_page'     => $workspaces->perPage(),
+            'total'        => $workspaces->total(),
+        ],
+    ]);
+}
+public function showPublic(Workspace $workspace): JsonResponse
+{
+    // إذا مو public — 404
+    if (!$workspace->is_public) {
+        return response()->json([
+            'message' => 'هذه الرحلة غير متاحة للعموم',
+        ], 404);
+    }
+
+   $workspace->load(['owner', 'participants'])
+              ->loadCount('participants');
+
+    return response()->json([
+        'workspace' => new WorkspaceResource($workspace),
+    ]);
+}
     // POST /api/workspaces
     public function store(StoreWorkspaceRequest $request): JsonResponse
     {
