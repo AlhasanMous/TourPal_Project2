@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { getProfileImageUrl } from '../../utils/helpers';
 import userService from '../../services/userService';
 
 import PageHeader from '../../components/layout/PageHeader';
@@ -172,7 +173,7 @@ export default function UsersList() {
                 <div className="flex items-center gap-3">
                     {user.profile_photo ? (
                         <img
-                            src={user.profile_photo}
+                            src={getProfileImageUrl(user.profile_photo)}
                             alt={user.name}
                             className={`h-10 w-10 rounded-full object-cover ring-2 ring-offset-2 ${roleRingClass(user)}`}
                         />

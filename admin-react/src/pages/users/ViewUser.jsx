@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 
+import { getProfileImageUrl } from '../../utils/helpers';
 import userService from '../../services/userService';
 
 import PageHeader from '../../components/layout/PageHeader';
@@ -131,7 +132,7 @@ export default function ViewUser() {
                     <div className="flex items-center gap-4">
                         {user.profile_photo ? (
                             <img
-                                src={user.profile_photo}
+                                src={getProfileImageUrl(user.profile_photo)}
                                 alt={user.name}
                                 className="h-16 w-16 rounded-xl object-cover"
                             />

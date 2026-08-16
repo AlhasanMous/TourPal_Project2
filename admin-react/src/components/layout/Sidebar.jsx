@@ -8,6 +8,7 @@ import {
     UserCheck,
      Hotel,
       Bus,
+      Calendar,
 } from 'lucide-react';
 
 const menuItems = [
@@ -18,6 +19,11 @@ const menuItems = [
     { name: 'Places', path: '/places', icon: MapPin },
     { name: 'Workspaces', path: '/workspaces', icon: Briefcase },
        { name: 'Accommodations', path: '/accommodations', icon: Hotel },
+       {
+    name: 'Acco_Bookings',
+    path: '/accommodation-bookings',
+    icon: Calendar,
+},
        { name: 'Transport', path: '/transport', icon: Bus },
 ];
 

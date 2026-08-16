@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { HiBriefcase } from 'react-icons/hi2';
+import { getProfileImageUrl } from '../../utils/helpers';
 import guideService from '../../services/guideService';
 import cityService from '../../services/cityService';
 import RejectModal from './RejectModal';
@@ -156,7 +157,7 @@ export default function GuidesList() {
                 <div className="flex items-center gap-3">
                     {g.user?.profile_photo ? (
                         <img
-                            src={g.user.profile_photo}
+                            src={getProfileImageUrl(g.user.profile_photo)}
                             alt={g.user.name}
                             className="h-10 w-10 rounded-full object-cover ring-2 ring-violet-200 ring-offset-2"
                         />

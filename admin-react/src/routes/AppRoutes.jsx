@@ -40,6 +40,19 @@ import EditTransportCompany from '../pages/transport/EditTransportCompany';
 import CreateTransportRoute from '../pages/transport/CreateTransportRoute';
 import EditTransportRoute from '../pages/transport/EditTransportRoute';
 
+
+
+import AccommodationBookingsList from '../pages/accommodationBookings/AccommodationBookingsList';
+import AccommodationBookingDetails from '../pages/accommodationBookings/AccommodationBookingDetails';
+
+
+
+
+import NotificationsList from '../pages/notifications/NotificationsList';
+
+
+
+
 export default function AppRoutes() {
     return (
         <Routes>
@@ -114,6 +127,25 @@ export default function AppRoutes() {
 <Route
     path="/accommodations/:id"
     element={<AccommodationDetails />}
+/>
+
+<Route
+    path="/accommodation-bookings"
+    element={<AccommodationBookingsList />}
+/>
+
+<Route
+    path="/accommodation-bookings/:id"
+    element={<AccommodationBookingDetails />}
+/>
+
+
+
+
+
+<Route
+    path="/notifications"
+    element={<NotificationsList />}
 />
 
 
