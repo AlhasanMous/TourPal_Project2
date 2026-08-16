@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             TransportSeeder::class,
             // Added seeders
             UsersSeeder::class,
+            AccommodationSeeder::class,
             GuidesSeeder::class,
             WorkspaceSeeder::class,
             BookingsSeeder::class,

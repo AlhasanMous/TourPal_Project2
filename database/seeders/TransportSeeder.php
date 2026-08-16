@@ -41,6 +41,34 @@ class TransportSeeder extends Seeder
             ]
         );
 
+        // Additional transport companies to increase dataset
+        $syriaExpress = TransportCompany::firstOrCreate(
+            ['name_en' => 'Syria Express'],
+            [
+                'name_ar'   => 'سيريا إكسبرس',
+                'phone'     => '+963-11-9988776',
+                'is_active' => true,
+            ]
+        );
+
+        $shamTransport = TransportCompany::firstOrCreate(
+            ['name_en' => 'Sham Transport'],
+            [
+                'name_ar'   => 'شام للنقل',
+                'phone'     => '+963-41-3344556',
+                'is_active' => true,
+            ]
+        );
+
+        $damascusTravel = TransportCompany::firstOrCreate(
+            ['name_en' => 'Damascus Travel'],
+            [
+                'name_ar'   => 'دمشق للسفر',
+                'phone'     => '+963-11-2233445',
+                'is_active' => true,
+            ]
+        );
+
         // ─── المسارات ──────────────────────────────────────
         $routes = [];
 

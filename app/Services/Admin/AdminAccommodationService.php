@@ -43,27 +43,62 @@ class AdminAccommodationService
                             ->findOrFail($id);
     }
 
-    public function getPending(): LengthAwarePaginator
-    {
-        return Accommodation::with(['host', 'city'])
-            ->where('verification_status', 'pending')
-            ->latest()
-            ->paginate(20);
-    }
+  public function getPending(): LengthAwarePaginator
+{
+    return Accommodation::with(['host', 'city', 'images'])
+        ->where('verification_status', 'pending')
+        ->latest()
+        ->paginate(20);
+}
 
-    public function create(array $data): Accommodation
-    {
-        return DB::transaction(function () use ($data) {
-            $accommodation = Accommodation::create($data);
+   public function create(array $data): Accommodation
+{
+    return DB::transaction(function () use ($data) {
 
-            $host = User::findOrFail($data['host_user_id']);
-            if (!$host->hasRole('host')) {
-                $host->assignRole('host');
+        $image = $data['image'] ?? null;
+        $imageUrl = $data['image_url'] ?? null;
+
+        unset($data['image'], $data['image_url']);
+
+        $host = User::findOrFail($data['host_user_id']);
+
+        if (!$host->hasRole('host')) {
+            $host->assignRole('host');
+        }
+
+        $accommodation = Accommodation::create([
+            ...$data,
+            'verification_status' => 'pending',
+        ]);
+
+        if ($image && $image->isValid()) {
+
+            $path = $image->store('accommodations', 'public');
+
+            $this->createMainImage(
+                $accommodation,
+                '/storage/' . $path
+            );
+
+        } elseif ($imageUrl) {
+
+            $storedUrl = $this->storeWebImage($imageUrl);
+
+            if ($storedUrl) {
+                $this->createMainImage(
+                    $accommodation,
+                    $storedUrl
+                );
             }
+        }
 
-            return $accommodation;
-        });
-    }
+        return $accommodation->load([
+            'host',
+            'city',
+            'images',
+        ]);
+    });
+}
 
     public function verify(Accommodation $accommodation, string $action, ?string $reason): Accommodation
     {

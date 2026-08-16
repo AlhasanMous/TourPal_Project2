@@ -29,9 +29,9 @@ class UpdateAccommodationRequest extends FormRequest
             'city_id'     => ['sometimes', 'exists:cities,id'],
             'capacity'    => ['sometimes', 'integer', 'min:1'],
             'price_range' => ['nullable', 'string', 'max:50'],
-            'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
-            'image_url'   => ['nullable', 'url'],
-        ];
+            'image' => ['nullable','image','mimes:jpg,jpeg,png,webp'
+            ,'max:5120','prohibited_with:image_url',],
+            'image_url' => ['nullable','url','prohibited_with:image',], ];
     }
 
     public function messages(): array
