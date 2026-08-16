@@ -32,9 +32,15 @@ class AdminAccommodationResource extends JsonResource
                 'email' => $this->host->email,
             ]),
 
-            'main_image'       => $this->whenLoaded('images', fn() =>
-                $this->images->where('is_main', true)->first()?->image_url
-            ),
+            'main_image' => $this->whenLoaded('images', function () {
+            $image = $this->images
+             ->where('is_main', true)
+                ->first();
+
+            return $image
+                ? $this->imageUrl($image->image_url)
+                : null;
+                 }),
             'bookings_count'   => $this->whenCounted('bookings'),
             'reviews_count'    => $this->whenCounted('reviews'),
         ];
