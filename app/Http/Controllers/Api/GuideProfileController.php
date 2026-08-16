@@ -18,21 +18,26 @@ class GuideProfileController extends Controller
     // POST /api/guide/profile
     // Guide ينشئ profile تبعه
     // ─────────────────────────────────────────
-    public function store(StoreGuideProfileRequest $request): JsonResponse
-    {
-        $guide = $this->profileService->createProfile(
-            $request->user(),
-            $request->validated()
-        );
+public function store(StoreGuideProfileRequest $request): JsonResponse
+{
+    $data = $request->validated();
 
-        $guide->load(['user', 'city', 'images']);
-
-        return response()->json([
-            'message' => 'تم إنشاء حساب المرشد بنجاح، في انتظار مراجعة الإدارة',
-            'guide'   => new GuideResource($guide),
-        ], 201);
+    if ($request->hasFile('image')) {
+        $data['image'] = $request->file('image');
     }
 
+    $guide = $this->profileService->createProfile(
+        $request->user(),
+        $data
+    );
+
+    $guide->load(['user', 'city', 'images']);
+
+    return response()->json([
+        'message' => 'تم إنشاء حساب المرشد بنجاح، في انتظار مراجعة الإدارة',
+        'guide'   => new GuideResource($guide),
+    ], 201);
+}
     // ─────────────────────────────────────────
     // GET /api/guide/profile
     // Guide يشوف profile تبعه
@@ -52,16 +57,22 @@ class GuideProfileController extends Controller
     // PUT /api/guide/profile
     // Guide يعدل profile تبعه
     // ─────────────────────────────────────────
-    public function update(UpdateGuideProfileRequest $request): JsonResponse
-    {
-        $guide = $this->profileService->updateProfile(
-            $request->user(),
-            $request->validated()
-        );
+public function update(UpdateGuideProfileRequest $request): JsonResponse
+{
+    $data = $request->validated();
 
-        return response()->json([
-            'message' => 'تم تحديث الملف الشخصي بنجاح',
-            'guide'   => new GuideResource($guide),
-        ]);
+    if ($request->hasFile('image')) {
+        $data['image'] = $request->file('image');
     }
+
+    $guide = $this->profileService->updateProfile(
+        $request->user(),
+        $data
+    );
+
+    return response()->json([
+        'message' => 'تم تحديث الملف الشخصي بنجاح',
+        'guide'   => new GuideResource($guide),
+    ]);
+}
 }

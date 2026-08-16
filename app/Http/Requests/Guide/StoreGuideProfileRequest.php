@@ -16,8 +16,9 @@ class StoreGuideProfileRequest extends FormRequest
         return [
             'city_id'         => ['required', 'integer', 'exists:cities,id'],
             'specializations' => ['required', 'array', 'min:1'],
-'specializations.*' => ['required', 'string', 'max:100'],
-           
+            'specializations.*' => ['required', 'string', 'max:100'],
+            'image'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120', 'required_without:image_url'],
+            'image_url' => ['nullable', 'url', 'required_without:image'],
             'availability'    => ['nullable', 'array'],
         ];
     }
