@@ -13,7 +13,7 @@ class StoreAccommodationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'host_user_id' => ['required', 'integer', 'exists:users,id'],
+            // 'host_user_id' => ['required', 'integer', 'exists:users,id'],
             'name'         => ['required', 'string', 'max:255'],
             'type'         => ['required', 'in:hotel,hostel,shared'],
             'city_id'      => ['required', 'integer', 'exists:cities,id'],

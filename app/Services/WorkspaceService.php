@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Workspace;
 use Illuminate\Support\Collection;
-
+use Illuminate\Pagination\LengthAwarePaginator;
 class WorkspaceService
 {
     // كل الـ Workspaces تبع المستخدم (مالك + مشارك)
@@ -21,6 +21,26 @@ class WorkspaceService
         ->latest()
         ->get();
     }
+    // في app/Services/WorkspaceService.php
+    public function getPublicWorkspaces(array $filters = []): LengthAwarePaginator
+    {
+             $query = Workspace::with(['owner'])
+                      ->withCount('participants')
+                      ->where('is_public', true);
+                    //   ->whereNull('deleted_at');
+
+            // بحث باسم الـ Workspace
+         if (!empty($filters['search'])) {
+        $query->where('name', 'like', '%' . $filters['search'] . '%');
+            }
+
+            // فلترة بتاريخ الرحلة
+         if (!empty($filters['start_date'])) {
+             $query->where('trip_start_date', '>=', $filters['start_date']);
+         }
+
+    return $query->latest()->paginate(15);
+}
 
     public function create(array $data, int $ownerId): Workspace
     {
@@ -40,4 +60,5 @@ class WorkspaceService
     {
         $workspace->delete();
     }
+
 }
