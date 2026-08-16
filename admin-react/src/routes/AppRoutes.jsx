@@ -52,6 +52,15 @@ import NotificationsList from '../pages/notifications/NotificationsList';
 
 
 
+import TouristMatchesList from '../pages/matching/TouristMatchesList';
+
+
+
+import ReviewsList from '../pages/reviews/ReviewsList';
+
+import TouristMatchDetails from '../pages/matching/TouristMatchDetails';
+
+
 
 export default function AppRoutes() {
     return (
@@ -140,6 +149,26 @@ export default function AppRoutes() {
 />
 
 
+<Route
+    path="/matching"
+    element={<TouristMatchesList />}
+/>
+
+
+
+<Route
+    path="/matching"
+    element={<TouristMatchesList />}
+/>
+
+<Route
+    path="/matching/:id"
+    element={<TouristMatchDetails />}
+/>
+
+
+
+
 
 
 
@@ -147,6 +176,15 @@ export default function AppRoutes() {
     path="/notifications"
     element={<NotificationsList />}
 />
+
+
+
+
+<Route
+    path="/reviews"
+    element={<ReviewsList />}
+/>
+
 
 
 

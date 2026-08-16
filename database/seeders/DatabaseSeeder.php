@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             AccommodationSeeder::class,
             GuidesSeeder::class,
             WorkspaceSeeder::class,
+            TouristMatchSeeder::class,
             AccommodationBookingSeeder::class,
             NotificationSeeder::class,
             BookingsSeeder::class,

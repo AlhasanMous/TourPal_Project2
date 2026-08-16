@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { jsPDF } from 'jspdf';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
     HiCalendarDays,
@@ -233,6 +234,121 @@ export default function WorkspaceTimeline() {
             item.title ??
             (item.item_type === 'place' && item.reference_id ? `Place #${item.reference_id}` : 'Timeline Activity')
         );
+    };
+
+    const handleExportPdf = () => {
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const margin = 40;
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const maxTextWidth = pageWidth - margin * 2;
+        const lineHeight = 18;
+        let y = margin;
+
+        const addWrappedText = (text, x, startY, maxWidth, lineSpacing = lineHeight) => {
+            const safeText = String(text ?? '').replace(/\s+/g, ' ').trim() || '—';
+            const lines = doc.splitTextToSize(safeText, maxWidth);
+
+            lines.forEach((line) => {
+                if (y > doc.internal.pageSize.getHeight() - margin) {
+                    doc.addPage();
+                    y = margin;
+                }
+                doc.text(line, x, y);
+                y += lineSpacing;
+            });
+        };
+
+        doc.setFontSize(18);
+        doc.setTextColor(30, 41, 59);
+        doc.text(workspace?.name ? `${workspace.name} Timeline` : 'Workspace Timeline', margin, y);
+        y += 28;
+
+        doc.setFontSize(10);
+        doc.setTextColor(72, 85, 99);
+        addWrappedText(
+            workspace?.description || 'No workspace description provided.',
+            margin,
+            y,
+            maxTextWidth,
+            14
+        );
+        y += 12;
+
+        const dateRange = [workspace?.trip_start_date, workspace?.trip_end_date]
+            .filter(Boolean)
+            .join(' → ') || 'No date range available';
+        addWrappedText(`Date range: ${dateRange}`, margin, y, maxTextWidth, 14);
+        y += 18;
+
+        const exportEntries = Object.entries(groupedTimeline);
+
+        if (exportEntries.length === 0) {
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text('No timeline activities were found for this workspace.', margin, y + 10);
+            doc.save(`workspace-timeline-${id || 'unknown'}.pdf`);
+            return;
+        }
+
+        exportEntries.forEach(([date, items]) => {
+            if (y > doc.internal.pageSize.getHeight() - 120) {
+                doc.addPage();
+                y = margin;
+            }
+
+            doc.setFontSize(12);
+            doc.setTextColor(79, 70, 229);
+            doc.text(formatDate(date), margin, y);
+            y += 22;
+
+            items.forEach((item, index) => {
+                if (y > doc.internal.pageSize.getHeight() - 80) {
+                    doc.addPage();
+                    y = margin;
+                }
+
+                doc.setFontSize(10);
+                doc.setTextColor(17, 24, 39);
+                const title = `${index + 1}. ${getItemTitle(item)}`;
+                addWrappedText(title, margin, y, maxTextWidth - 18, 14);
+                y += 18;
+
+                doc.setTextColor(71, 85, 105);
+                const meta = [
+                    item.item_type ? `Type: ${getTypeLabel(item.item_type)}` : null,
+                    item.planned_time ? `Time: ${formatTime(item.planned_time)}` : null,
+                    item.duration_minutes ? `Duration: ${item.duration_minutes} min` : null,
+                    item.participants_count !== undefined ? `Participants: ${item.participants_count}` : null,
+                    item.added_by?.name ? `Added by: ${item.added_by.name}` : null,
+                ].filter(Boolean);
+
+                if (meta.length) {
+                    addWrappedText(meta.join(' • '), margin, y, maxTextWidth, 12);
+                    y += 16;
+                }
+
+                if (item.description) {
+                    addWrappedText(`Description: ${item.description}`, margin, y, maxTextWidth, 12);
+                    y += 14;
+                }
+
+                if (item.note) {
+                    addWrappedText(`Note: ${item.note}`, margin, y, maxTextWidth, 12);
+                    y += 14;
+                }
+
+                if (item.place?.name_en || item.place?.name_ar) {
+                    addWrappedText(`Place: ${item.place?.name_en || item.place?.name_ar}`, margin, y, maxTextWidth, 12);
+                    y += 14;
+                }
+
+                y += 8;
+            });
+
+            y += 8;
+        });
+
+        doc.save(`workspace-timeline-${id || 'unknown'}.pdf`);
     };
 
     if (loading) {
@@ -666,6 +782,7 @@ export default function WorkspaceTimeline() {
 
         <button
             type="button"
+            onClick={handleExportPdf}
             className="block w-full rounded-lg border border-gray-200 px-4 py-3 text-left text-sm font-medium text-gray-700 transition hover:bg-gray-50"
         >
             Export Timeline (PDF)

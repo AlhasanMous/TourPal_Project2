@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { HiOutlineLocationMarker } from 'react-icons/hi';
 
+import { getImageUrl } from '../../utils/helpers';
 import workspaceService from '../../services/workspaceService';
 
 import PageHeader from '../../components/layout/PageHeader';
@@ -150,9 +151,18 @@ export default function WorkspacePlaces() {
 
                         <div className="relative">
                             <img
-                                src={place.images?.[0]?.url ?? '/images/no-image.png'}
+                                src={getImageUrl(
+                                    place.main_image ??
+                                    place.image_url ??
+                                    place.images?.[0]?.url ??
+                                    place.images?.[0]?.image_url ??
+                                    '/images/no-image.png'
+                                )}
                                 alt={place.name}
                                 className="h-72 w-full rounded-xl object-cover"
+                                onError={(event) => {
+                                    event.currentTarget.src = '/images/no-image.png';
+                                }}
                             />
 
                             <div className="absolute left-4 top-4 rounded-full bg-white/80 px-3 py-1 text-sm font-medium text-gray-800">

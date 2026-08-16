@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Place;
+
 class ReviewController extends Controller
 {
     public function __construct(private ReviewService $reviewService) {}
@@ -52,7 +53,6 @@ class ReviewController extends Controller
                 'message' => 'تم إضافة تقييمك بنجاح',
                 'review'  => new ReviewResource($review),
             ], 201);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage(),
@@ -69,7 +69,6 @@ class ReviewController extends Controller
             return response()->json([
                 'message' => 'تم حذف التقييم بنجاح',
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage(),
@@ -77,56 +76,115 @@ class ReviewController extends Controller
         }
     }
     // GET /api/admin/reviews?type=place&id=1
-public function adminIndex(Request $request): JsonResponse
-{
-    $request->validate([
-        'type' => ['sometimes', 'in:place,guide,accommodation'],
-        'id'   => ['sometimes', 'integer'],
-    ]);
+    // public function adminIndex(Request $request): JsonResponse
+    // {
+    //     $request->validate([
+    //         'type' => ['sometimes', 'in:place,guide,accommodation'],
+    //         'id'   => ['sometimes', 'integer'],
+    //     ]);
 
-    $query = Review::with('reviewer')->latest();
+    //     $query = Review::with('reviewer')->latest();
 
-    if ($request->type) {
-        $query->where('reviewable_type', $request->type);
-    }
+    //     if ($request->type) {
+    //         $query->where('reviewable_type', $request->type);
+    //     }
 
-    if ($request->id) {
-        $query->where('reviewable_id', $request->id);
-    }
+    //     if ($request->id) {
+    //         $query->where('reviewable_id', $request->id);
+    //     }
 
-    $reviews = $query->paginate(20);
+    //     $reviews = $query->paginate(20);
 
-    return response()->json([
-        'reviews' => ReviewResource::collection($reviews),
-        'meta'    => [
-            'current_page' => $reviews->currentPage(),
-            'last_page'    => $reviews->lastPage(),
-            'per_page'     => $reviews->perPage(),
-            'total'        => $reviews->total(),
-        ],
-    ]);
-}
+    //     return response()->json([
+    //         'reviews' => ReviewResource::collection($reviews),
+    //         'meta'    => [
+    //             'current_page' => $reviews->currentPage(),
+    //             'last_page'    => $reviews->lastPage(),
+    //             'per_page'     => $reviews->perPage(),
+    //             'total'        => $reviews->total(),
+    //         ],
+    //     ]);
+    // }
 
-// DELETE /api/admin/reviews/{review}
-public function adminDestroy(Review $review): JsonResponse
-{
-    DB::transaction(function () use ($review) {
-        $type = $review->reviewable_type;
-        $id   = $review->reviewable_id;
 
-        $review->delete();
+    // GET /api/admin/reviews?type=place&id=1
+    public function adminIndex(Request $request): JsonResponse
+    {
+        $request->validate([
+            'type' => ['sometimes', 'in:place,guide,accommodation'],
+            'id'   => ['sometimes', 'integer', 'min:1'],
+        ]);
 
-        if ($type === 'place') {
-            $avg = Review::where('reviewable_type', 'place')
-                ->where('reviewable_id', $id)
-                ->avg('rating') ?? 0;
+        $query = Review::with('reviewer')->latest();
 
-            Place::where('id', $id)->update(['avg_rating' => round($avg, 2)]);
+        /*
+    |--------------------------------------------------------------------------
+    | Filter by reviewable type
+    |--------------------------------------------------------------------------
+    | The database stores the full model class:
+    | App\Models\Place
+    | App\Models\Guide
+    | App\Models\Accommodation
+    |
+    | But the frontend sends:
+    | place / guide / accommodation
+    |--------------------------------------------------------------------------
+    */
+
+        if ($request->filled('type')) {
+            $typeMap = [
+                'place'         => \App\Models\Place::class,
+                'guide'         => \App\Models\Guide::class,
+                'accommodation' => \App\Models\Accommodation::class,
+            ];
+
+            $query->where(
+                'reviewable_type',
+                $typeMap[$request->type]
+            );
         }
-    });
 
-    return response()->json([
-        'message' => 'تم حذف التقييم بنجاح',
-    ]);
-}
+        if ($request->filled('id')) {
+            $query->where(
+                'reviewable_id',
+                $request->id
+            );
+        }
+
+        $reviews = $query->paginate(20);
+
+        return response()->json([
+            'reviews' => ReviewResource::collection($reviews),
+            'meta'    => [
+                'current_page' => $reviews->currentPage(),
+                'last_page'    => $reviews->lastPage(),
+                'per_page'     => $reviews->perPage(),
+                'total'        => $reviews->total(),
+            ],
+        ]);
+    }
+
+
+    // DELETE /api/admin/reviews/{review}
+    public function adminDestroy(Review $review): JsonResponse
+    {
+        DB::transaction(function () use ($review) {
+            $type = $review->reviewable_type;
+            $id   = $review->reviewable_id;
+
+            $review->delete();
+
+            if ($type === 'place') {
+                $avg = Review::where('reviewable_type', 'place')
+                    ->where('reviewable_id', $id)
+                    ->avg('rating') ?? 0;
+
+                Place::where('id', $id)->update(['avg_rating' => round($avg, 2)]);
+            }
+        });
+
+        return response()->json([
+            'message' => 'تم حذف التقييم بنجاح',
+        ]);
+    }
 }

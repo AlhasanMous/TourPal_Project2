@@ -9,6 +9,8 @@ import {
      Hotel,
       Bus,
       Calendar,
+       Star,
+      UsersRound,
 } from 'lucide-react';
 
 const menuItems = [
@@ -24,7 +26,15 @@ const menuItems = [
     path: '/accommodation-bookings',
     icon: Calendar,
 },
+  {
+        name: 'Tourist Matches',
+        path: '/matching',
+        icon: UsersRound,
+    },
+
        { name: 'Transport', path: '/transport', icon: Bus },
+
+       { name: 'Reviews', path: '/reviews', icon: Star },
 ];
 
 export default function Sidebar() {

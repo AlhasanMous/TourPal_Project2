@@ -26,3 +26,31 @@ export const getProfileImageUrl = (photo) => {
 
     return `${getBackendBaseUrl()}/storage/${photo}`;
 };
+
+export const getImageUrl = (image) => {
+    if (!image) {
+        return '/images/no-image.png';
+    }
+
+    if (/^https?:\/\//i.test(image)) {
+        return image;
+    }
+
+    if (image.startsWith('/storage/')) {
+        return `${getBackendBaseUrl()}${image}`;
+    }
+
+    if (image.startsWith('storage/')) {
+        return `${getBackendBaseUrl()}/${image}`;
+    }
+
+    if (image.startsWith('profile-photos/') || image.startsWith('avatars/')) {
+        return `${getBackendBaseUrl()}/storage/${image}`;
+    }
+
+    if (image.startsWith('/')) {
+        return `${getBackendBaseUrl()}${image}`;
+    }
+
+    return `${getBackendBaseUrl()}/storage/${image}`;
+};
