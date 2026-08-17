@@ -20,9 +20,15 @@ const me = async () => {
     return data;
 };
 
+const updateProfile = async (payload) => {
+    const { data } = await api.put('/profile', payload);
+    return data;
+};
+
 export default {
     login,
     register,
     logout,
     me,
+    updateProfile,
 };

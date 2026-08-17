@@ -15,6 +15,7 @@ import {
 
 const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'Profile', path: '/profile', icon: Users },
     { name: 'Users', path: '/users', icon: Users },
     { name: 'Guides', path: '/guides', icon: UserCheck },
     { name: 'Cities', path: '/cities', icon: Building2 },

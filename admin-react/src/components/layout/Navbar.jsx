@@ -359,7 +359,7 @@ export default function Navbar() {
                     {/* Profile */}
 
                     <Link
-                        to="/dashboard"
+                        to="/profile"
                         className="flex items-center gap-2"
                     >
                         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white">

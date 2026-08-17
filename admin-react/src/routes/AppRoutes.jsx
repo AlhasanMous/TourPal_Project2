@@ -9,6 +9,7 @@ import Register from '../pages/auth/Register';
 import ForgotPassword from '../pages/auth/ForgotPassword';
 import ResetPassword from '../pages/auth/ResetPassword';
 import Dashboard from '../pages/Dashboard';
+import AdminProfile from '../pages/AdminProfile';
 import CitiesList from '../pages/cities/CitiesList';
 import CreateCity from '../pages/cities/CreateCity';
 import EditCity from '../pages/cities/EditCity';
@@ -81,6 +82,7 @@ export default function AppRoutes() {
                 }
             >
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/profile" element={<AdminProfile />} />
                 <Route path="/users" element={<UsersList />} />
                 <Route path="/users/:id" element={<ViewUser />} />
                 <Route path="/users/:id/edit" element={<EditUser />} />
