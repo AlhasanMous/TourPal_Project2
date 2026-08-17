@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
     HiMap,
     HiMapPin,
@@ -7,6 +8,9 @@ import {
     HiClipboardDocumentList,
     HiArrowTrendingUp,
     HiSparkles,
+    HiHomeModern,
+    HiExclamationTriangle,
+    HiArrowRight,
 } from 'react-icons/hi2';
 
 import cityService from '../services/cityService';
@@ -14,6 +18,7 @@ import placeService from '../services/placeService';
 import userService from '../services/userService';
 import guideService from '../services/guideService';
 import workspaceService from '../services/workspaceService';
+import accommodationService from '../services/accommodationService';
 
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
@@ -40,6 +45,41 @@ const StatCard = ({ title, value, icon: Icon, tone = 'indigo' }) => {
                     <Icon className="text-xl" />
                 </div>
             </div>
+        </div>
+    );
+};
+
+// purely visual — a "needs attention" card with a count + Review button,
+// used by the Quick Actions section. Not tied to any specific resource.
+const ActionCard = ({ title, value, description, to, icon: Icon, tone = 'rose' }) => {
+    const tones = {
+        rose: 'bg-rose-50 text-rose-600',
+        amber: 'bg-amber-50 text-amber-600',
+    };
+
+    return (
+        <div className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="flex items-center gap-4">
+                <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${tones[tone]}`}>
+                    <Icon className="text-xl" />
+                </div>
+
+                <div>
+                    <p className="text-sm font-medium text-slate-500">{title}</p>
+                    <div className="flex items-baseline gap-2">
+                        <h2 className="text-2xl font-bold text-slate-800">{value}</h2>
+                        <span className="text-xs text-slate-400">{description}</span>
+                    </div>
+                </div>
+            </div>
+
+            <Link
+                to={to}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-slate-800 px-3.5 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+            >
+                Review
+                <HiArrowRight className="text-sm" />
+            </Link>
         </div>
     );
 };
@@ -89,6 +129,10 @@ const extractTotal = (payload, fallback = 0) => {
         return payload.places.length;
     }
 
+    if (Array.isArray(payload.accommodations)) {
+        return payload.accommodations.length;
+    }
+
     return fallback;
 };
 
@@ -112,6 +156,8 @@ export default function Dashboard() {
         guides: 0,
         workspaces: 0,
         pendingGuides: 0,
+        accommodations: 0,
+        pendingAccommodations: 0,
     });
     const [recentActivities, setRecentActivities] = useState([]);
 
@@ -123,13 +169,24 @@ export default function Dashboard() {
             setLoading(true);
             setError('');
 
-            const [cities, placesData, usersData, guidesData, workspacesData, pendingGuidesData] = await Promise.all([
+            const [
+                cities,
+                placesData,
+                usersData,
+                guidesData,
+                workspacesData,
+                pendingGuidesData,
+                accommodationsData,
+                pendingAccommodationsData,
+            ] = await Promise.all([
                 cityService.getAll(),
                 placeService.getPlaces({ per_page: 1 }),
                 userService.getUsers({ per_page: 5 }),
                 guideService.getGuides({ per_page: 5 }),
                 workspaceService.getWorkspaces({ per_page: 5 }),
                 guideService.getPending({ per_page: 1 }),
+                accommodationService.getAccommodations({ per_page: 1 }),
+                accommodationService.getPendingAccommodations({ per_page: 1 }),
             ]);
 
             const users = Array.isArray(usersData.users) ? usersData.users : [];
@@ -143,6 +200,8 @@ export default function Dashboard() {
                 guides: extractTotal(guidesData),
                 workspaces: extractTotal(workspacesData),
                 pendingGuides: extractTotal(pendingGuidesData),
+                accommodations: extractTotal(accommodationsData),
+                pendingAccommodations: extractTotal(pendingAccommodationsData),
             });
 
             const activityList = [
@@ -226,10 +285,32 @@ export default function Dashboard() {
             tone: 'amber',
         },
         {
+            title: 'Accommodations',
+            value: stats.accommodations,
+            icon: HiHomeModern,
+            tone: 'sky',
+        },
+    ];
+
+    // purely visual — items needing admin review, only shown when there's something to review
+    const actionItems = [
+        {
+            key: 'pendingGuides',
             title: 'Pending Guides',
             value: stats.pendingGuides,
+            description: 'awaiting verification',
+            to: '/guides',
             icon: HiArrowTrendingUp,
             tone: 'rose',
+        },
+        {
+            key: 'pendingAccommodations',
+            title: 'Pending Accommodations',
+            value: stats.pendingAccommodations,
+            description: 'awaiting verification',
+            to: '/accommodations/pending',
+            icon: HiExclamationTriangle,
+            tone: 'amber',
         },
     ];
 
@@ -264,6 +345,31 @@ export default function Dashboard() {
                     />
                 ))}
             </div>
+
+            {/* Quick Actions — needs-review items, only shown when there's something to act on */}
+            {actionItems.some((item) => item.value > 0) && (
+                <div className="mt-8">
+                    <h2 className="mb-3 text-lg font-semibold text-slate-800">
+                        Requires Attention
+                    </h2>
+
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        {actionItems
+                            .filter((item) => item.value > 0)
+                            .map((item) => (
+                                <ActionCard
+                                    key={item.key}
+                                    title={item.title}
+                                    value={item.value}
+                                    description={item.description}
+                                    to={item.to}
+                                    icon={item.icon}
+                                    tone={item.tone}
+                                />
+                            ))}
+                    </div>
+                </div>
+            )}
 
             <div className="mt-8 rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
