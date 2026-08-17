@@ -33,18 +33,18 @@ class User extends Authenticatable
         'password_hash',
     ];
 
-    protected $appends = [
-        'profile_photo_url',
-    ];
+    // protected $appends = [
+    //     'profile_photo_url',
+    // ];
 
-    public function getProfilePhotoUrlAttribute(): ?string
-    {
-        if (!$this->profile_photo) {
-            return null;
-        }
+    // public function getProfilePhotoUrlAttribute(): ?string
+    // {
+    //     if (!$this->profile_photo) {
+    //         return null;
+    //     }
 
-        return asset('storage/' . ltrim($this->profile_photo, '/'));
-    }
+    //     return asset('storage/' . ltrim($this->profile_photo, '/'));
+    // }
 
     protected function casts(): array
     {
