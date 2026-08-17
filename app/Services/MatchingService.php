@@ -29,14 +29,16 @@ class MatchingService
 
         // جلب السياح الآخرين اللي عندهم نفس المدن
         $potentialMatches = User::where('id', '!=', $user->id)
-            ->where('is_matching_enabled', true)
-            ->whereHas('workspaces', fn($q) =>
-                $q->whereHas('places', fn($q2) =>
-                    $q2->whereIn('places.city_id', $userCities)
-                )
-            )
-            ->with(['workspaces.places.city'])
-            ->get();
+    ->where('is_matching_enabled', true)
+    ->whereHas('ownedWorkspaces', fn($q) =>
+    $q->whereHas('places', fn($q2) =>
+        $q2->whereHas('place', fn($q3) =>
+            $q3->whereIn('city_id', $userCities)
+        )
+    )
+)
+->with(['ownedWorkspaces.places.place.city'])
+    ->get();
 
         $results = [];
 
@@ -165,16 +167,19 @@ public function getConnections(int $userId): \Illuminate\Support\Collection
     // ─────────────────────────────────────────
     // Helpers
     // ─────────────────────────────────────────
-    private function getUserCities(int $userId): \Illuminate\Support\Collection
-    {
-        return DB::table('workspace_places')
-            ->join('workspaces', 'workspace_places.workspace_id', '=', 'workspaces.id')
-            ->join('places', 'workspace_places.place_id', '=', 'places.id')
-            ->where('workspaces.owner_user_id', $userId)
-            ->whereNull('workspaces.deleted_at')
-            ->pluck('places.city_id')
-            ->unique();
-    }
+   private function getUserCities(int $userId): \Illuminate\Support\Collection
+{
+    return \App\Models\WorkspacePlace::whereHas('workspace', fn($q) =>
+            $q->where('owner_user_id', $userId)
+              ->whereNull('deleted_at')
+        )
+        ->whereHas('place')
+        ->with('place')
+        ->get()
+        ->pluck('place.city_id')
+        ->filter()
+        ->unique();
+}
 
     private function createConversation(TouristMatch $match): void
     {
