@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import { UserCircle2, Mail, FileText, Languages as LanguagesIcon, ShieldCheck } from 'lucide-react';
+import {
+    UserCircle2,
+    Mail,
+    FileText,
+    Languages as LanguagesIcon,
+    ShieldCheck,
+    Save,
+    CheckCircle2,
+} from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
@@ -116,7 +124,7 @@ export default function AdminProfile() {
     }
 
     return (
-        <div className="max-w-5xl">
+        <div className="w-full">
             <PageHeader
                 title="Admin Profile"
                 subtitle="Manage your account details and basic profile settings."
@@ -125,12 +133,13 @@ export default function AdminProfile() {
             <ErrorMessage message={error} />
 
             {success && (
-                <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                <div className="mb-4 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                    <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
                     {success}
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
                         <div className="flex items-center gap-4">
@@ -145,12 +154,13 @@ export default function AdminProfile() {
                         </div>
 
                         <Button type="submit" disabled={saving} className="px-5 py-2.5">
+                            <Save className="mr-1.5 inline-block h-4 w-4" />
                             {saving ? 'Saving...' : 'Save Changes'}
                         </Button>
                     </div>
                 </div>
 
-                <div className="grid gap-6 lg:grid-cols-2">
+                <div className="grid gap-4 lg:grid-cols-2">
                     <FormSection icon={UserCircle2} title="Basic Information" accentClass="text-violet-500">
                         <div className="space-y-4">
                             <Input
@@ -163,7 +173,7 @@ export default function AdminProfile() {
                             />
 
                             <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-600">
+                                <label className="mb-2 flex items-center gap-2 text-sm font-bold text-slate-600">
                                     <Mail className="h-4 w-4 text-slate-500" />
                                     Email Address
                                 </label>

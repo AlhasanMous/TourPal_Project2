@@ -11,6 +11,7 @@ import {
     HiHomeModern,
     HiExclamationTriangle,
     HiArrowRight,
+    HiTicket,
 } from 'react-icons/hi2';
 
 import cityService from '../services/cityService';
@@ -19,6 +20,8 @@ import userService from '../services/userService';
 import guideService from '../services/guideService';
 import workspaceService from '../services/workspaceService';
 import accommodationService from '../services/accommodationService';
+import guideBookingService from '../services/guideBookingService';
+import accommodationBookingService from '../services/accommodationBookingService';
 
 import Loading from '../components/common/Loading';
 import ErrorMessage from '../components/common/ErrorMessage';
@@ -133,6 +136,10 @@ const extractTotal = (payload, fallback = 0) => {
         return payload.accommodations.length;
     }
 
+    if (Array.isArray(payload.bookings)) {
+        return payload.bookings.length;
+    }
+
     return fallback;
 };
 
@@ -158,6 +165,8 @@ export default function Dashboard() {
         pendingGuides: 0,
         accommodations: 0,
         pendingAccommodations: 0,
+        guideBookings: 0,
+        accommodationBookings: 0,
     });
     const [recentActivities, setRecentActivities] = useState([]);
 
@@ -178,6 +187,8 @@ export default function Dashboard() {
                 pendingGuidesData,
                 accommodationsData,
                 pendingAccommodationsData,
+                guideBookingsData,
+                accommodationBookingsData,
             ] = await Promise.all([
                 cityService.getAll(),
                 placeService.getPlaces({ per_page: 1 }),
@@ -187,6 +198,8 @@ export default function Dashboard() {
                 guideService.getPending({ per_page: 1 }),
                 accommodationService.getAccommodations({ per_page: 1 }),
                 accommodationService.getPendingAccommodations({ per_page: 1 }),
+                guideBookingService.getBookings({ per_page: 1 }),
+                accommodationBookingService.getBookings({ per_page: 1 }),
             ]);
 
             const users = Array.isArray(usersData.users) ? usersData.users : [];
@@ -202,6 +215,8 @@ export default function Dashboard() {
                 pendingGuides: extractTotal(pendingGuidesData),
                 accommodations: extractTotal(accommodationsData),
                 pendingAccommodations: extractTotal(pendingAccommodationsData),
+                guideBookings: extractTotal(guideBookingsData),
+                accommodationBookings: extractTotal(accommodationBookingsData),
             });
 
             const activityList = [
@@ -292,7 +307,7 @@ export default function Dashboard() {
         },
     ];
 
-    // purely visual — items needing admin review, only shown when there's something to review
+    // purely visual — items needing admin review, always shown regardless of count
     const actionItems = [
         {
             key: 'pendingGuides',
@@ -311,6 +326,22 @@ export default function Dashboard() {
             to: '/accommodations/pending',
             icon: HiExclamationTriangle,
             tone: 'amber',
+        },
+    ];
+
+    // purely visual — booking overview cards
+    const bookingCards = [
+        {
+            title: 'Guide Bookings',
+            value: stats.guideBookings,
+            icon: HiTicket,
+            tone: 'violet',
+        },
+        {
+            title: 'Accommodation Bookings',
+            value: stats.accommodationBookings,
+            icon: HiTicket,
+            tone: 'sky',
         },
     ];
 
@@ -346,30 +377,45 @@ export default function Dashboard() {
                 ))}
             </div>
 
-            {/* Quick Actions — needs-review items, only shown when there's something to act on */}
-            {actionItems.some((item) => item.value > 0) && (
-                <div className="mt-8">
-                    <h2 className="mb-3 text-lg font-semibold text-slate-800">
-                        Requires Attention
-                    </h2>
+            {/* Quick Actions — needs-review items, always visible */}
+            <div className="mt-8">
+                <h2 className="mb-3 text-lg font-semibold text-slate-800">
+                    Requires Attention
+                </h2>
 
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        {actionItems
-                            .filter((item) => item.value > 0)
-                            .map((item) => (
-                                <ActionCard
-                                    key={item.key}
-                                    title={item.title}
-                                    value={item.value}
-                                    description={item.description}
-                                    to={item.to}
-                                    icon={item.icon}
-                                    tone={item.tone}
-                                />
-                            ))}
-                    </div>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    {actionItems.map((item) => (
+                        <ActionCard
+                            key={item.key}
+                            title={item.title}
+                            value={item.value}
+                            description={item.description}
+                            to={item.to}
+                            icon={item.icon}
+                            tone={item.tone}
+                        />
+                    ))}
                 </div>
-            )}
+            </div>
+
+            {/* Booking Overview */}
+            <div className="mt-8">
+                <h2 className="mb-3 text-lg font-semibold text-slate-800">
+                    Booking Overview
+                </h2>
+
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    {bookingCards.map((card) => (
+                        <StatCard
+                            key={card.title}
+                            title={card.title}
+                            value={card.value}
+                            icon={card.icon}
+                            tone={card.tone}
+                        />
+                    ))}
+                </div>
+            </div>
 
             <div className="mt-8 rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">

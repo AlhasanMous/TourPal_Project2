@@ -62,6 +62,10 @@ import ReviewsList from '../pages/reviews/ReviewsList';
 import TouristMatchDetails from '../pages/matching/TouristMatchDetails';
 
 
+import GuideBookingsList from '../pages/guideBookings/GuideBookingsList';
+import GuideBookingDetails from '../pages/guideBookings/GuideBookingDetails';
+
+
 
 export default function AppRoutes() {
     return (
@@ -170,7 +174,15 @@ export default function AppRoutes() {
 
 
 
+<Route
+    path="/guide-bookings"
+    element={<GuideBookingsList />}
+/>
 
+<Route
+    path="/guide-bookings/:id"
+    element={<GuideBookingDetails />}
+/>
 
 
 

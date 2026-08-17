@@ -11,6 +11,7 @@ import {
       Calendar,
        Star,
       UsersRound,
+       CalendarDays,
 } from 'lucide-react';
 
 const menuItems = [
@@ -18,11 +19,16 @@ const menuItems = [
     { name: 'Profile', path: '/profile', icon: Users },
     { name: 'Users', path: '/users', icon: Users },
     { name: 'Guides', path: '/guides', icon: UserCheck },
+   {
+    name: 'Guide Bookings',
+    path: '/guide-bookings',
+    icon: CalendarDays,
+},
     { name: 'Cities', path: '/cities', icon: Building2 },
     { name: 'Places', path: '/places', icon: MapPin },
     { name: 'Workspaces', path: '/workspaces', icon: Briefcase },
        { name: 'Accommodations', path: '/accommodations', icon: Hotel },
-       {
+        {
     name: 'Acco_Bookings',
     path: '/accommodation-bookings',
     icon: Calendar,
