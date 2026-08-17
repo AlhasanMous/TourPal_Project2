@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\WishlistController;
 use App\Http\Controllers\Api\MatchingController;
 use App\Http\Controllers\Api\Admin\MatchingController as AdminMatchingController;
+use App\Http\Controllers\Api\Admin\GuideBookingController as AdminGuideBookingController;
 // ─────────────────────────────────────────────────────────
 // Public — Auth
 // ─────────────────────────────────────────────────────────
@@ -217,4 +218,11 @@ Route::middleware(['auth:sanctum', 'role:admin'])
         });
         Route::get('reviews',               [ReviewController::class, 'adminIndex']);
         Route::delete('reviews/{review}',   [ReviewController::class, 'adminDestroy']);
+
+        //guide booking admin 
+        Route::prefix('guide-bookings')->group(function () {
+         Route::get('/',                   [AdminGuideBookingController::class, 'index']);
+         Route::get('/{booking}',          [AdminGuideBookingController::class, 'show']);
+         Route::patch('/{booking}/cancel', [AdminGuideBookingController::class, 'cancel']);
+        });
     });
